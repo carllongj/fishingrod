@@ -1,0 +1,24 @@
+rod:
+  # 接口使用的共同参数配置
+  common:
+    headers:
+      - User-Agent:
+          - Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36
+    parameters:
+      - id:
+          - 123
+  task-info:
+    - page-config:
+        first-page: "page.html"
+        page-format: "page_%d.html"
+        page-url: "http://carllongj.github.io"
+      base-url:
+      url:
+      httpMethod: get
+      httpConfig:
+        headers:
+          - User-Agent:
+              - Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36
+        parameters:
+          - id:
+              - 123
