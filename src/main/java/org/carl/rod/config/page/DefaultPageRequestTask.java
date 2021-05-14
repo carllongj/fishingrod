@@ -9,23 +9,33 @@ import org.carl.rod.config.task.PageInfo;
  */
 public class DefaultPageRequestTask extends AbstractHttpParameterTask implements HttpPageRequestTask {
 
-    /**
-     * 分页查询请求参数信息
-     */
-    private PageInfo pageInfo;
+	/**
+	 * 分页查询请求参数信息
+	 */
+	private PageInfo pageInfo;
 
-    public DefaultPageRequestTask() {
-    }
+	public DefaultPageRequestTask() {
+	}
 
-    public DefaultPageRequestTask(PageInfo pageInfo) {
-        this.pageInfo = pageInfo;
-    }
+	public DefaultPageRequestTask(PageInfo pageInfo) {
+		this.pageInfo = pageInfo;
+	}
 
-    @Override
-    public PageStrategy getPageStrategy() {
-        if (null != pageInfo) {
-            return new PageFormatStrategy(pageInfo);
-        }
-        return null;
-    }
+	public DefaultPageRequestTask(String taskName, PageInfo pageInfo) {
+		super(taskName);
+		this.pageInfo = pageInfo;
+	}
+
+	@Override
+	public PageStrategy getPageStrategy() {
+		if (null != pageInfo) {
+			return new PageFormatStrategy(pageInfo);
+		}
+		return null;
+	}
+
+	@Override
+	public boolean executeTask() {
+		return false;
+	}
 }

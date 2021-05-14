@@ -8,68 +8,81 @@ import org.carl.rod.config.task.PageInfo;
  */
 public class TaskConfiguration {
 
-    /**
-     * 进行分页查询任务设置
-     */
-    private PageInfo pageConfig;
+	/**
+	 * 任务名称
+	 */
+	private String taskName;
 
-    /**
-     * http 基础根路径设置
-     */
-    private String baseUrl;
+	/**
+	 * 进行分页查询任务设置
+	 */
+	private PageInfo pageConfig;
 
-    /**
-     * http 请求url设置
-     */
-    private String url;
+	/**
+	 * http 基础根路径设置
+	 */
+	private String baseUrl;
 
-    /**
-     * http请求方法设置
-     */
-    private String httpMethod;
+	/**
+	 * http 请求url设置
+	 */
+	private String url;
 
-    /**
-     * http 请求参数和请求头设置
-     */
-    private HttpRequestConfiguration httpConfig;
+	/**
+	 * http请求方法设置
+	 */
+	private String httpMethod;
 
-    public PageInfo getPageConfig() {
-        return pageConfig;
-    }
+	/**
+	 * http 请求参数和请求头设置
+	 */
+	private HttpRequestConfiguration httpConfig;
 
-    public void setPageConfig(PageInfo pageConfig) {
-        this.pageConfig = pageConfig;
-    }
+	public String getTaskName() {
+		return taskName;
+	}
 
-    public String getBaseUrl() {
-        return baseUrl;
-    }
+	public void setTaskName(String taskName) {
+		this.taskName = taskName;
+	}
 
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
-    }
+	public PageInfo getPageConfig() {
+		return pageConfig;
+	}
 
-    public String getUrl() {
-        return url;
-    }
+	public void setPageConfig(PageInfo pageConfig) {
+		this.pageConfig = pageConfig;
+	}
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
+	public String getBaseUrl() {
+		return baseUrl;
+	}
 
-    public String getHttpMethod() {
-        return httpMethod;
-    }
+	public void setBaseUrl(String baseUrl) {
+		this.baseUrl = baseUrl;
+	}
 
-    public void setHttpMethod(String httpMethod) {
-        this.httpMethod = httpMethod;
-    }
+	public String getUrl() {
+		return url;
+	}
 
-    public HttpRequestConfiguration getHttpConfig() {
-        return httpConfig;
-    }
+	public void setUrl(String url) {
+		this.url = url;
+	}
 
-    public void setHttpConfig(HttpRequestConfiguration httpConfig) {
-        this.httpConfig = httpConfig;
-    }
+	public String getHttpMethod() {
+		return httpMethod;
+	}
+
+	public void setHttpMethod(String httpMethod) {
+		this.httpMethod = httpMethod;
+	}
+
+	public HttpRequestConfiguration getHttpConfig() {
+		return httpConfig;
+	}
+
+	public void setHttpConfig(HttpRequestConfiguration httpConfig) {
+		this.httpConfig = httpConfig;
+	}
 }

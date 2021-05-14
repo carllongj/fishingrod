@@ -8,24 +8,22 @@ import org.carl.rod.config.task.Task;
  */
 public abstract class AbstractTask implements Task {
 
-    private String taskName;
+	private String taskName;
 
-    public AbstractTask() {
-        // TODO: 2021/5/13 生成指定的名称
-        this.taskName = "";
-    }
+	public AbstractTask() {
+	}
 
-    public AbstractTask(String taskName) {
-        this.taskName = taskName;
-    }
+	public AbstractTask(String taskName) {
+		this.taskName = taskName;
+	}
 
-    @Override
-    public String getTaskName() {
-        return this.taskName;
-    }
+	@Override
+	public String getTaskName() {
+		return this.taskName;
+	}
 
-    @Override
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
+	@Override
+	public void setTaskName(String taskName) {
+		this.taskName = taskName;
+	}
 }

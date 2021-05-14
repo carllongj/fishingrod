@@ -5,6 +5,7 @@ import org.carl.rod.config.base.HttpRequestConfiguration;
 import org.carl.rod.config.base.RodBaseConfiguration;
 import org.carl.rod.config.base.TaskConfiguration;
 import org.carl.rod.config.task.Task;
+import org.carl.rod.core.name.TaskNameGenerator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,72 +19,97 @@ import java.util.Objects;
  */
 public abstract class AbstractTaskFactory implements TaskFactory {
 
-    /**
-     * 任务处理
-     */
-    private List<TaskPostProcessor> taskPostProcessors;
+	/**
+	 * 任务处理
+	 */
+	private List<TaskPostProcessor> taskPostProcessors;
 
-    public AbstractTaskFactory() {
-        this.taskPostProcessors = new ArrayList<>();
-    }
+	/**
+	 * 名称生成器
+	 */
+	private TaskNameGenerator taskNameGenerator;
 
-    @Override
-    public void addTaskPostProcessor(TaskPostProcessor processor) {
-        this.taskPostProcessors.add(processor);
-    }
+	public AbstractTaskFactory() {
+		this.taskPostProcessors = new ArrayList<>();
+	}
 
-    @Override
-    public List<Task> createTask(RodBaseConfiguration configuration) {
-        if (null == configuration) {
-            return Collections.emptyList();
-        }
+	@Override
+	public void addTaskPostProcessor(TaskPostProcessor processor) {
+		this.taskPostProcessors.add(processor);
+	}
 
-        return doCreateTasks(configuration.getRod());
-    }
+	@Override
+	public void setTaskNameGenerator(TaskNameGenerator taskNameGenerator) {
+		this.taskNameGenerator = taskNameGenerator;
+	}
 
-    private List<Task> doCreateTasks(DefaultConfiguration rod) {
-        List<TaskConfiguration> taskInfo = rod.getTaskInfo();
+	@Override
+	public TaskNameGenerator getTaskNameGenerator() {
+		return taskNameGenerator;
+	}
 
-        // 若当前配置项中未进行设置任务信息
-        if (Objects.isNull(taskInfo) || taskInfo.isEmpty()) {
-            return Collections.emptyList();
-        }
+	@Override
+	public List<Task> createTask(RodBaseConfiguration configuration) {
+		if (null == configuration) {
+			return Collections.emptyList();
+		}
 
-        List<Task> taskList = new LinkedList<>();
+		return doCreateTasks(configuration.getRod());
+	}
 
-        // 遍历所有的任务
-        for (TaskConfiguration taskConfiguration : taskInfo) {
-            for (int i = 0; i < taskPostProcessors.size(); i++) {
-                // 合并参数配置项
-                mergeConfiguration(rod.getCommon(), taskConfiguration);
+	private List<Task> doCreateTasks(DefaultConfiguration rod) {
+		List<TaskConfiguration> taskInfo = rod.getTaskInfo();
 
-                TaskPostProcessor processor = taskPostProcessors.get(i);
+		// 若当前配置项中未进行设置任务信息
+		if (Objects.isNull(taskInfo) || taskInfo.isEmpty()) {
+			return Collections.emptyList();
+		}
 
-                if (processor instanceof TaskCreatePostProcessor) {
-                    ((TaskCreatePostProcessor) processor).beforeCreateTask(taskConfiguration);
-                }
-            }
+		List<Task> taskList = new LinkedList<>();
 
-            // 创建任务
-            Task task = doCreateTask(taskConfiguration);
+		// 遍历所有的任务
+		for (TaskConfiguration taskConfiguration : taskInfo) {
+			for (int i = 0; i < taskPostProcessors.size(); i++) {
+				// 合并参数配置项
+				mergeConfiguration(rod.getCommon(), taskConfiguration);
 
-            //任务创建完成后的后置增强
-            for (int i = 0; i < taskPostProcessors.size(); i++) {
-                task = taskPostProcessors.get(i).postProcess(task);
-            }
+				TaskPostProcessor processor = taskPostProcessors.get(i);
 
-            // 添加任务
-            taskList.add(task);
-        }
-        return taskList;
-    }
+				if (processor instanceof TaskCreatePostProcessor) {
+					((TaskCreatePostProcessor) processor).beforeCreateTask(taskConfiguration);
+				}
+			}
 
-    protected void mergeConfiguration(HttpRequestConfiguration common, TaskConfiguration taskConfiguration) {
-        // 合并相同的参数配置项
-        taskConfiguration.getHttpConfig().addHttpRequestConfiguration(common);
-    }
+			// 创建任务
+			Task task = doCreateTask(taskConfiguration);
 
-    protected Task doCreateTask(TaskConfiguration task) {
-        return null;
-    }
+			//任务创建完成后的后置增强
+			for (int i = 0; i < taskPostProcessors.size(); i++) {
+				task = taskPostProcessors.get(i).postProcess(task, taskConfiguration);
+			}
+
+			// 添加任务
+			taskList.add(task);
+		}
+		return taskList;
+	}
+
+	/**
+	 * 合并请求参数的相同配置项
+	 *
+	 * @param common            通用配置项
+	 * @param taskConfiguration 任务配置项
+	 */
+	protected void mergeConfiguration(HttpRequestConfiguration common, TaskConfiguration taskConfiguration) {
+		// 合并相同的参数配置项
+		taskConfiguration.getHttpConfig().addHttpRequestConfiguration(common);
+	}
+
+	/**
+	 * 创建任务
+	 *
+	 * @param taskConfig 执行创建任务
+	 * @return 返回创建完成的任务
+	 */
+	protected abstract Task doCreateTask(TaskConfiguration taskConfig);
 }
