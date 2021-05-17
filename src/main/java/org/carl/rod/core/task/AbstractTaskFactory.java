@@ -39,6 +39,11 @@ public abstract class AbstractTaskFactory implements TaskFactory {
 	}
 
 	@Override
+	public List<TaskPostProcessor> getTaskPostProcessor() {
+		return this.taskPostProcessors;
+	}
+
+	@Override
 	public void setTaskNameGenerator(TaskNameGenerator taskNameGenerator) {
 		this.taskNameGenerator = taskNameGenerator;
 	}

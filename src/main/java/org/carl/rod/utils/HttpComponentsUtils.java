@@ -10,11 +10,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
+import java.io.Closeable;
+
 /**
  * @author longjie
  * 2021/5/14
  */
-public abstract class HttpComponentsBuildUtils {
+public abstract class HttpComponentsUtils {
 
 	/**
 	 * 创建默认的 Http请求客户端
@@ -22,7 +24,8 @@ public abstract class HttpComponentsBuildUtils {
 	 * @return 返回执行 http请求客户端
 	 */
 	public static CloseableHttpClient createDefault() {
-		Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create().register("http", PlainConnectionSocketFactory.getSocketFactory())
+		Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
+			.register("http", PlainConnectionSocketFactory.getSocketFactory())
 			.register("https", SSLConnectionSocketFactory.getSocketFactory()).build();
 		PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(registry);
 		connectionManager.setMaxTotal(200);
@@ -40,5 +43,20 @@ public abstract class HttpComponentsBuildUtils {
 		// 创建Http客户端
 		return HttpClientBuilder.create().setDefaultRequestConfig(requestConfig)
 			.setConnectionManager(connectionManager).build();
+	}
+
+	/**
+	 * 关闭Http组件相关的流信息
+	 *
+	 * @param closeable 指定的可关闭流
+	 */
+	public static void closeHttpResourceQuietly(Closeable closeable) {
+		if (null != closeable) {
+			try {
+				closeable.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

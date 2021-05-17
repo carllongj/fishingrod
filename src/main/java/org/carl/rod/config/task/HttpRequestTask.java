@@ -1,6 +1,7 @@
 package org.carl.rod.config.task;
 
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.carl.rod.core.http.HttpRequestExecutor;
 
 import java.util.List;
 import java.util.Map;
@@ -75,4 +76,25 @@ public interface HttpRequestTask extends Task {
 	 * @param httpComponent 指定的http请求客户端
 	 */
 	void setHttpComponent(CloseableHttpClient httpComponent);
+
+	/**
+	 * 获取当前的HttpClient 对象
+	 *
+	 * @return 返回当前设置的httpClient
+	 */
+	CloseableHttpClient getHttpClient();
+
+	/**
+	 * Http 请求执行器
+	 *
+	 * @param executor http请求执行器
+	 */
+	void setHttpExecutor(HttpRequestExecutor executor);
+
+	/**
+	 * 获取当前的Http请求执行器
+	 *
+	 * @return 返回对应的请求执行器
+	 */
+	HttpRequestExecutor getHttpExecutor();
 }

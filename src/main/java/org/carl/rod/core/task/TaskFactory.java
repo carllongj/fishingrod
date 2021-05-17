@@ -40,4 +40,11 @@ public interface TaskFactory {
 	 * @param processor 添加任务处理器
 	 */
 	void addTaskPostProcessor(TaskPostProcessor processor);
+
+	/**
+	 * 获取当前所有的任务处理器
+	 *
+	 * @return 返回所有的任务处理器
+	 */
+	List<TaskPostProcessor> getTaskPostProcessor();
 }

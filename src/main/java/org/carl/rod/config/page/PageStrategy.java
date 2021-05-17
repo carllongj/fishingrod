@@ -8,11 +8,18 @@ package org.carl.rod.config.page;
  */
 public interface PageStrategy {
 
-    /**
-     * 获取指定的分页url地址
-     *
-     * @param page 指定的页码数
-     * @return 返回对应的页的地址
-     */
-    String getPageUrl(Integer page);
+	/**
+	 * 获取指定的分页url地址
+	 *
+	 * @param page 指定的页码数
+	 * @return 返回对应的页的地址
+	 */
+	String getPageUrl(Integer page);
+
+	/**
+	 * 获取当前的分页记录数
+	 *
+	 * @return 返回分页记录数
+	 */
+	int getTotalPage();
 }

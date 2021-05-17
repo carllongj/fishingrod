@@ -25,6 +25,11 @@ public abstract class AbstractCtlTask extends AbstractTask implements TaskCtl {
 	 */
 	private List<TaskOutputHandler> taskOutputHandlers;
 
+	/**
+	 * 是否开启路径地址过滤
+	 */
+	private Boolean enablePathFilter;
+
 	public AbstractCtlTask() {
 	}
 
@@ -63,5 +68,10 @@ public abstract class AbstractCtlTask extends AbstractTask implements TaskCtl {
 	@Override
 	public void addTaskOutputHandler(TaskOutputHandler taskOutputHandler) {
 		this.taskOutputHandlers.add(taskOutputHandler);
+	}
+
+	@Override
+	public boolean enablePathFilter() {
+		return null == enablePathFilter ? true : enablePathFilter;
 	}
 }

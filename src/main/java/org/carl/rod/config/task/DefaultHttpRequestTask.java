@@ -14,9 +14,4 @@ public class DefaultHttpRequestTask extends AbstractHttpParameterTask {
 	public DefaultHttpRequestTask(String taskName) {
 		super(taskName);
 	}
-
-	@Override
-	public boolean executeTask() {
-		return false;
-	}
 }

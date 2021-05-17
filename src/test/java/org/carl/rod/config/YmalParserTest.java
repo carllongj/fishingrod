@@ -1,6 +1,7 @@
 package org.carl.rod.config;
 
 import org.carl.rod.config.base.RodBaseConfiguration;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -9,9 +10,9 @@ import org.testng.annotations.Test;
  */
 public class YmalParserTest {
 
-    @Test
-    public void testParse() {
-        RodBaseConfiguration rodBaseConfiguration = YamlConfigurationLoader.load("classpath:fishingrod-template.yml", RodBaseConfiguration.class);
-        System.out.println(rodBaseConfiguration);
-    }
+	@Test
+	public void testParse() {
+		RodBaseConfiguration rodBaseConfiguration = YamlConfigurationLoader.load("classpath:fishingrod-template.yml", RodBaseConfiguration.class);
+		Assert.assertNotNull(rodBaseConfiguration);
+	}
 }
