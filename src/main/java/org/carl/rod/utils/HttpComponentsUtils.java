@@ -11,6 +11,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 import java.io.Closeable;
+import java.net.URL;
 
 /**
  * @author longjie

@@ -1,0 +1,22 @@
+rod:
+  # 接口使用的共同参数配置
+  common:
+    headers:
+      User-Agent:
+        - Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36
+      Accept:
+        - text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+      Connection:
+        - keep-alive
+  task-info:
+    - task-name: spider-main
+      url: http://www.sc.gov.cn/10462/10464/10797/2021/5/18/ebc8068529c246de8caa68bf450d4d4a.shtml
+      httpMethod: get
+      selector:
+        content:
+          - "#articlecontent ucaptitle"
+        time:
+          - "#articleattribute"
+      output:
+        path: "F:\\work\\file\\record"
+        suffix: "result"

@@ -11,7 +11,7 @@ public interface HttpUriRequestWrapper {
 	/**
 	 * 获取当前原始配置的请求数据
 	 *
-	 * @return
+	 * @return 返回原始的请求链接
 	 */
 	String getOriginUri();
 

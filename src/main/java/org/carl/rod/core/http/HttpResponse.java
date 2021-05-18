@@ -1,6 +1,7 @@
 package org.carl.rod.core.http;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.entity.ContentType;
 
 import java.io.Closeable;
 
@@ -45,4 +46,11 @@ public interface HttpResponse extends Closeable {
 	 * @return 返回是否为html页面
 	 */
 	boolean isHyperTextDocument();
+
+	/**
+	 * 获取原始的响应任务类型
+	 *
+	 * @return 返回对应的响应类型
+	 */
+	ContentType getContentType();
 }

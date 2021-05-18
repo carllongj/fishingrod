@@ -1,6 +1,7 @@
 package org.carl.rod.core.http;
 
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.carl.rod.core.http.handlers.HttpFinishedHandler;
 
 import java.util.List;
 
@@ -18,5 +19,7 @@ public interface HttpRequestExecutor {
 	 * @param failedHandlerList 请求失败执行处理器
 	 * @return 返回对应的响应结果
 	 */
-	HttpResponse executeHttpRequest(CloseableHttpClient httpClient, HttpUriRequestWrapper request, List<HttpFailedHandler> failedHandlerList);
+	HttpResponse executeHttpRequest(CloseableHttpClient httpClient,
+									HttpUriRequestWrapper request,
+									List<HttpFinishedHandler> failedHandlerList);
 }

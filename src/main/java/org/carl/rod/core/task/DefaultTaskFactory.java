@@ -1,5 +1,6 @@
 package org.carl.rod.core.task;
 
+import org.carl.rod.config.base.HttpRequestConfiguration;
 import org.carl.rod.config.base.TaskConfiguration;
 import org.carl.rod.config.page.DefaultPageRequestTask;
 import org.carl.rod.config.task.DefaultHttpRequestTask;
@@ -8,6 +9,8 @@ import org.carl.rod.config.task.PageInfo;
 import org.carl.rod.config.task.Task;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -37,10 +40,10 @@ public class DefaultTaskFactory extends AbstractTaskFactory {
 
 		DefaultPageRequestTask pageRequestTask
 			= new DefaultPageRequestTask(this.getTaskNameGenerator().generateTaskName(), taskConfig.getPageConfig());
-		pageRequestTask.setBaseUrl(taskConfig.getBaseUrl());
+		pageRequestTask.setUrl(taskConfig.getUrl());
 		pageRequestTask.setHttpMethod(taskConfig.getHttpMethod());
 		DefaultHttpRequestTask requestTask = new DefaultHttpRequestTask(this.getTaskNameGenerator().generateTaskName());
-		requestTask.setBaseUrl(taskConfig.getBaseUrl());
+		requestTask.setUrl(taskConfig.getUrl());
 		requestTask.setHttpMethod(taskConfig.getHttpMethod());
 		return new DefaultStagedTask(taskName, Arrays.asList(pageRequestTask, requestTask));
 	}
@@ -59,8 +62,27 @@ public class DefaultTaskFactory extends AbstractTaskFactory {
 			taskName = this.getTaskNameGenerator().generateTaskName();
 		}
 		DefaultHttpRequestTask requestTask = new DefaultHttpRequestTask(taskName);
-		requestTask.setBaseUrl(taskConfig.getBaseUrl());
+		requestTask.setUrl(taskConfig.getUrl());
 		requestTask.setHttpMethod(taskConfig.getHttpMethod());
+		if (null != taskConfig.getHttpConfig()) {
+			HttpRequestConfiguration httpConfig = taskConfig.getHttpConfig();
+
+			if (null != httpConfig.getHeaders()) {
+				for (Map.Entry<String, List<String>> entry : httpConfig.getHeaders().entrySet()) {
+					for (String value : entry.getValue()) {
+						requestTask.addRequestHeader(entry.getKey(), value);
+					}
+				}
+			}
+
+			if (null != httpConfig.getParameters()) {
+				for (Map.Entry<String, List<String>> entry : httpConfig.getParameters().entrySet()) {
+					for (String value : entry.getValue()) {
+						requestTask.addRequestHeader(entry.getKey(), value);
+					}
+				}
+			}
+		}
 		return requestTask;
 	}
 }

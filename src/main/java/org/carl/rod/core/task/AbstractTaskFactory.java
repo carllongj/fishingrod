@@ -4,7 +4,10 @@ import org.carl.rod.config.base.DefaultConfiguration;
 import org.carl.rod.config.base.HttpRequestConfiguration;
 import org.carl.rod.config.base.RodBaseConfiguration;
 import org.carl.rod.config.base.TaskConfiguration;
+import org.carl.rod.config.ctl.Document;
 import org.carl.rod.config.task.Task;
+import org.carl.rod.core.http.doc.DocumentCreator;
+import org.carl.rod.core.http.handlers.HttpFinishedHandler;
 import org.carl.rod.core.name.TaskNameGenerator;
 
 import java.util.ArrayList;
@@ -25,12 +28,24 @@ public abstract class AbstractTaskFactory implements TaskFactory {
 	private List<TaskPostProcessor> taskPostProcessors;
 
 	/**
+	 * 任务回调器
+	 */
+	private List<HttpFinishedHandler> finishedHandlers;
+
+	/**
+	 * 文档创建器
+	 */
+	private List<DocumentCreator> documentCreators;
+
+	/**
 	 * 名称生成器
 	 */
 	private TaskNameGenerator taskNameGenerator;
 
 	public AbstractTaskFactory() {
 		this.taskPostProcessors = new ArrayList<>();
+		this.documentCreators = new ArrayList<>();
+		this.finishedHandlers = new ArrayList<>();
 	}
 
 	@Override
@@ -54,6 +69,31 @@ public abstract class AbstractTaskFactory implements TaskFactory {
 	}
 
 	@Override
+	public void addFinishedHandler(HttpFinishedHandler finishedHandler) {
+		this.finishedHandlers.add(finishedHandler);
+	}
+
+	@Override
+	public List<HttpFinishedHandler> getHttpFinishedHandler() {
+		return finishedHandlers;
+	}
+
+	@Override
+	public void addDocumentCreator(DocumentCreator documentCreator) {
+		this.documentCreators.add(documentCreator);
+	}
+
+	@Override
+	public Document createDocument(Object source) {
+		for (DocumentCreator documentCreator : this.documentCreators) {
+			if (documentCreator.isSupport(source)) {
+				return documentCreator.createDocument(source);
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public List<Task> createTask(RodBaseConfiguration configuration) {
 		if (null == configuration) {
 			return Collections.emptyList();
@@ -74,14 +114,14 @@ public abstract class AbstractTaskFactory implements TaskFactory {
 
 		// 遍历所有的任务
 		for (TaskConfiguration taskConfiguration : taskInfo) {
+			// 合并参数配置项
+			mergeConfiguration(rod.getCommon(), taskConfiguration);
+
 			for (int i = 0; i < taskPostProcessors.size(); i++) {
-				// 合并参数配置项
-				mergeConfiguration(rod.getCommon(), taskConfiguration);
 
 				TaskPostProcessor processor = taskPostProcessors.get(i);
-
 				if (processor instanceof TaskCreatePostProcessor) {
-					((TaskCreatePostProcessor) processor).beforeCreateTask(taskConfiguration);
+					((TaskCreatePostProcessor) processor).beforeCreateTask(this, taskConfiguration);
 				}
 			}
 
@@ -107,6 +147,9 @@ public abstract class AbstractTaskFactory implements TaskFactory {
 	 */
 	protected void mergeConfiguration(HttpRequestConfiguration common, TaskConfiguration taskConfiguration) {
 		// 合并相同的参数配置项
+		if (null == taskConfiguration.getHttpConfig()) {
+			taskConfiguration.setHttpConfig(new HttpRequestConfiguration());
+		}
 		taskConfiguration.getHttpConfig().addHttpRequestConfiguration(common);
 	}
 

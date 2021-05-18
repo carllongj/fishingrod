@@ -2,6 +2,9 @@ package org.carl.rod.config.base;
 
 import org.carl.rod.config.task.PageInfo;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author longjie
  * 2021/5/13
@@ -19,11 +22,6 @@ public class TaskConfiguration {
 	private PageInfo pageConfig;
 
 	/**
-	 * http 基础根路径设置
-	 */
-	private String baseUrl;
-
-	/**
 	 * http 请求url设置
 	 */
 	private String url;
@@ -32,6 +30,16 @@ public class TaskConfiguration {
 	 * http请求方法设置
 	 */
 	private String httpMethod;
+
+	/**
+	 * 选择器映射
+	 */
+	private Map<String, List<String>> selector;
+
+	/**
+	 * 输出数据配置
+	 */
+	private OutputConfiguration output;
 
 	/**
 	 * http 请求参数和请求头设置
@@ -52,14 +60,6 @@ public class TaskConfiguration {
 
 	public void setPageConfig(PageInfo pageConfig) {
 		this.pageConfig = pageConfig;
-	}
-
-	public String getBaseUrl() {
-		return baseUrl;
-	}
-
-	public void setBaseUrl(String baseUrl) {
-		this.baseUrl = baseUrl;
 	}
 
 	public String getUrl() {
@@ -84,5 +84,21 @@ public class TaskConfiguration {
 
 	public void setHttpConfig(HttpRequestConfiguration httpConfig) {
 		this.httpConfig = httpConfig;
+	}
+
+	public Map<String, List<String>> getSelector() {
+		return selector;
+	}
+
+	public void setSelector(Map<String, List<String>> selector) {
+		this.selector = selector;
+	}
+
+	public OutputConfiguration getOutput() {
+		return output;
+	}
+
+	public void setOutput(OutputConfiguration output) {
+		this.output = output;
 	}
 }

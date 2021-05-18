@@ -5,7 +5,7 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.entity.ContentType;
 import org.apache.http.util.EntityUtils;
-import org.carl.rod.config.http.HttpHeaderKey;
+import org.carl.rod.config.http.HttpKeys;
 import org.carl.rod.utils.HttpComponentsUtils;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.util.Map;
  * @author longjie
  * 2021/5/17
  */
-public abstract class AbstractCloseableHttpResponse implements HttpResponse {
+public abstract class AbstractCloseableHttpResponse implements HttpResponse, LinkWrapper {
 
 	protected final CloseableHttpResponse response;
 
@@ -31,9 +31,20 @@ public abstract class AbstractCloseableHttpResponse implements HttpResponse {
 	 */
 	private Map<String, String> responseHeaders;
 
-	protected AbstractCloseableHttpResponse(CloseableHttpResponse response) {
+	/**
+	 * 请求包装对象
+	 */
+	private HttpUriRequestWrapper requestWrapper;
+
+	protected AbstractCloseableHttpResponse(CloseableHttpResponse response, HttpUriRequestWrapper requestWrapper) {
 		this.response = response;
+		this.requestWrapper = requestWrapper;
 		this.parseResponse(response);
+	}
+
+	@Override
+	public HttpUriRequestWrapper getOriginRequest() {
+		return this.requestWrapper;
 	}
 
 	@Override
@@ -46,6 +57,9 @@ public abstract class AbstractCloseableHttpResponse implements HttpResponse {
 	 */
 	private int code;
 
+	/**
+	 * 响应的类型
+	 */
 	private ContentType contentType;
 
 	/**
@@ -71,7 +85,7 @@ public abstract class AbstractCloseableHttpResponse implements HttpResponse {
 			} else {
 				this.responseHeaders = Collections.emptyMap();
 			}
-			this.contentType = ContentType.parse(responseHeaders.get(HttpHeaderKey.CONTENT_TYPE));
+			this.contentType = ContentType.parse(responseHeaders.get(HttpKeys.CONTENT_TYPE));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -104,5 +118,10 @@ public abstract class AbstractCloseableHttpResponse implements HttpResponse {
 		if (null != response) {
 			response.close();
 		}
+	}
+
+	@Override
+	public ContentType getContentType() {
+		return contentType;
 	}
 }

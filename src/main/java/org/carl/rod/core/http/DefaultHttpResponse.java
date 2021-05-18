@@ -8,7 +8,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
  */
 public class DefaultHttpResponse extends AbstractCloseableHttpResponse {
 
-	public DefaultHttpResponse(CloseableHttpResponse response) {
-		super(response);
+	public DefaultHttpResponse(CloseableHttpResponse response, HttpUriRequestWrapper requestWrapper) {
+		super(response, requestWrapper);
 	}
 }

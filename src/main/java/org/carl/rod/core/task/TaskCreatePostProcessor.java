@@ -8,10 +8,11 @@ import org.carl.rod.config.base.TaskConfiguration;
  */
 public interface TaskCreatePostProcessor extends TaskPostProcessor {
 
-    /**
-     * 执行创建对应的Task任务之前,修改和配置当前的TaskConfiguration
-     *
-     * @param configuration 创建任务参数信息
-     */
-    void beforeCreateTask(TaskConfiguration configuration);
+	/**
+	 * 执行创建对应的Task任务之前,修改和配置当前的TaskConfiguration
+	 *
+	 * @param taskFactory   任务创建工厂
+	 * @param configuration 创建任务参数信息
+	 */
+	void beforeCreateTask(TaskFactory taskFactory, TaskConfiguration configuration);
 }

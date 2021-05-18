@@ -1,7 +1,10 @@
 package org.carl.rod.core.task;
 
 import org.carl.rod.config.base.RodBaseConfiguration;
+import org.carl.rod.config.ctl.Document;
 import org.carl.rod.config.task.Task;
+import org.carl.rod.core.http.doc.DocumentCreator;
+import org.carl.rod.core.http.handlers.HttpFinishedHandler;
 import org.carl.rod.core.name.TaskNameGenerator;
 
 import java.util.List;
@@ -47,4 +50,33 @@ public interface TaskFactory {
 	 * @return 返回所有的任务处理器
 	 */
 	List<TaskPostProcessor> getTaskPostProcessor();
+
+	/**
+	 * 新增HttpFinishedHandler
+	 *
+	 * @param finishedHandler 新增HttpFinishedHandler
+	 */
+	void addFinishedHandler(HttpFinishedHandler finishedHandler);
+
+	/**
+	 * 获取所有的任务执行处理器
+	 *
+	 * @return 返回所有的处理器
+	 */
+	List<HttpFinishedHandler> getHttpFinishedHandler();
+
+	/**
+	 * 新增一个文档创建器
+	 *
+	 * @param documentCreator 文档创建
+	 */
+	void addDocumentCreator(DocumentCreator documentCreator);
+
+	/**
+	 * 进行创建对应的文档
+	 *
+	 * @param source 目标源对象
+	 * @return 返回创建完成的对象
+	 */
+	Document createDocument(Object source);
 }

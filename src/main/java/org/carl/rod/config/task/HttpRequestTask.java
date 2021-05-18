@@ -57,18 +57,18 @@ public interface HttpRequestTask extends Task {
 	String getHttpMethod();
 
 	/**
-	 * 指定当前任务的根链接地址
+	 * 指定当前任务的链接地址
 	 *
-	 * @param baseUrl 基础请求链接地址
+	 * @param requestUrl 请求链接地址
 	 */
-	void setBaseUrl(String baseUrl);
+	void setUrl(String requestUrl);
 
 	/**
 	 * 获取当前设置的根路径
 	 *
-	 * @return 返回对应的根路径地址
+	 * @return 返回对应的径地址
 	 */
-	String getBaseUrl();
+	String getUrl();
 
 	/**
 	 * 设置当前的http客户端
