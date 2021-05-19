@@ -1,7 +1,9 @@
 package org.carl.rod.core.task;
 
+import org.carl.rod.config.base.CommonConfiguration;
 import org.carl.rod.config.base.DefaultConfiguration;
 import org.carl.rod.config.base.HttpRequestConfiguration;
+import org.carl.rod.config.base.OutputConfiguration;
 import org.carl.rod.config.base.RodBaseConfiguration;
 import org.carl.rod.config.base.TaskConfiguration;
 import org.carl.rod.config.ctl.Document;
@@ -115,7 +117,9 @@ public abstract class AbstractTaskFactory implements TaskFactory {
 		// 遍历所有的任务
 		for (TaskConfiguration taskConfiguration : taskInfo) {
 			// 合并参数配置项
-			mergeConfiguration(rod.getCommon(), taskConfiguration);
+			if (null != rod.getCommon()) {
+				generateTaskConfiguration(rod.getCommon(), taskConfiguration);
+			}
 
 			for (int i = 0; i < taskPostProcessors.size(); i++) {
 
@@ -140,17 +144,61 @@ public abstract class AbstractTaskFactory implements TaskFactory {
 	}
 
 	/**
+	 * 生成所有的任务配置信息,包括任务名称相关信息
+	 *
+	 * @param common            公共配置信息
+	 * @param taskConfiguration 任务配置信息
+	 */
+	protected void generateTaskConfiguration(CommonConfiguration common, TaskConfiguration taskConfiguration) {
+		setTaskNameIfNecessary(taskConfiguration);
+		mergeOutputConfigurationIfNecessary(common, taskConfiguration);
+		mergeHttpConfigurationIfNecessary(common, taskConfiguration);
+	}
+
+	/**
+	 * 检查是否需要进行设置任务名称
+	 *
+	 * @param taskConfiguration 任务配置信息
+	 */
+	private void setTaskNameIfNecessary(TaskConfiguration taskConfiguration) {
+		if (Objects.isNull(taskConfiguration.getTaskName())) {
+			taskConfiguration.setTaskName(this.getTaskNameGenerator().generateTaskName());
+		}
+	}
+
+
+	/**
 	 * 合并请求参数的相同配置项
 	 *
 	 * @param common            通用配置项
 	 * @param taskConfiguration 任务配置项
 	 */
-	protected void mergeConfiguration(HttpRequestConfiguration common, TaskConfiguration taskConfiguration) {
+	private void mergeOutputConfigurationIfNecessary(CommonConfiguration common, TaskConfiguration taskConfiguration) {
+		// 普通的任务文件未进行设置
+		if (null == taskConfiguration.getOutput()) {
+			if (null == common.getOutput()) {
+				taskConfiguration.setOutput(OutputConfiguration.DEFAULT_OUTPUT_CONFIGURATION);
+			} else {
+				taskConfiguration.setOutput(common.getOutput());
+			}
+		}
+
+		//设置当前的输出文件名称
+		taskConfiguration.getOutput().setFileName(taskConfiguration.getTaskName());
+	}
+
+	/**
+	 * 合并相同的http参数配置项
+	 *
+	 * @param common            通用配置项
+	 * @param taskConfiguration 任务配置信息
+	 */
+	private void mergeHttpConfigurationIfNecessary(CommonConfiguration common, TaskConfiguration taskConfiguration) {
 		// 合并相同的参数配置项
 		if (null == taskConfiguration.getHttpConfig()) {
 			taskConfiguration.setHttpConfig(new HttpRequestConfiguration());
 		}
-		taskConfiguration.getHttpConfig().addHttpRequestConfiguration(common);
+		taskConfiguration.getHttpConfig().addHttpRequestConfiguration(common.getHttp());
 	}
 
 	/**

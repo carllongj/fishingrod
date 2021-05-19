@@ -1,5 +1,6 @@
 package org.carl.rod.config.task;
 
+import org.carl.rod.config.base.TaskConfiguration;
 import org.carl.rod.config.ctl.AbstractHttpParameterTask;
 
 /**
@@ -11,7 +12,7 @@ public class DefaultHttpRequestTask extends AbstractHttpParameterTask {
 	public DefaultHttpRequestTask() {
 	}
 
-	public DefaultHttpRequestTask(String taskName) {
-		super(taskName);
+	public DefaultHttpRequestTask(TaskConfiguration taskConfiguration) {
+		super(taskConfiguration);
 	}
 }

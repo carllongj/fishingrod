@@ -1,12 +1,14 @@
 rod:
   # 接口使用的共同参数配置
   common:
-    headers:
-      User-Agent:
-        - Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36
-    parameters:
-      id:
-        - 123
+    output:
+      path:
+      headers:
+        User-Agent:
+          - Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36
+      parameters:
+        id:
+          - 123
   task-info:
     - task-name: spider-main
       page-config:

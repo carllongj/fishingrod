@@ -5,7 +5,9 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicHeader;
+import org.carl.rod.config.base.TaskConfiguration;
 import org.carl.rod.config.task.HttpRequestTask;
+import org.carl.rod.config.task.TaskAware;
 import org.carl.rod.core.http.DefaultHttpUriRequestWrapper;
 import org.carl.rod.core.http.HttpRequestExecutor;
 import org.carl.rod.core.http.HttpResponse;
@@ -84,8 +86,8 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 		this.requestParameters = new LinkedHashMap<>();
 	}
 
-	public AbstractHttpParameterTask(String taskName) {
-		super(taskName);
+	public AbstractHttpParameterTask(TaskConfiguration taskConfiguration) {
+		super(taskConfiguration);
 		this.requestHeaders = new LinkedHashMap<>();
 		this.requestParameters = new LinkedHashMap<>();
 	}
@@ -229,6 +231,11 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 
 			// 获取到所有提取到的集合
 			Object extractValue = this.getTaskInput().handle(doc);
+
+			// 设置当前的任务信息
+			if (extractValue instanceof TaskAware) {
+				((TaskAware) extractValue).setTask(this);
+			}
 
 			for (TaskOutputHandler taskOutputHandler : this.getTaskOutputHandler()) {
 				if (taskOutputHandler.isSupport(extractValue)) {

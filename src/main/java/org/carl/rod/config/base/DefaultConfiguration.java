@@ -8,29 +8,29 @@ import java.util.List;
  */
 public class DefaultConfiguration {
 
-    /**
-     * 公共配置信息
-     */
-    private HttpRequestConfiguration common;
+	/**
+	 * 公共配置信息
+	 */
+	private CommonConfiguration common;
 
-    /**
-     * 任务配置记录
-     */
-    private List<TaskConfiguration> taskInfo;
+	/**
+	 * 任务配置记录
+	 */
+	private List<TaskConfiguration> taskInfo;
 
-    public HttpRequestConfiguration getCommon() {
-        return common;
-    }
+	public CommonConfiguration getCommon() {
+		return common;
+	}
 
-    public void setCommon(HttpRequestConfiguration common) {
-        this.common = common;
-    }
+	public void setCommon(CommonConfiguration common) {
+		this.common = common;
+	}
 
-    public List<TaskConfiguration> getTaskInfo() {
-        return taskInfo;
-    }
+	public List<TaskConfiguration> getTaskInfo() {
+		return taskInfo;
+	}
 
-    public void setTaskInfo(List<TaskConfiguration> taskInfo) {
-        this.taskInfo = taskInfo;
-    }
+	public void setTaskInfo(List<TaskConfiguration> taskInfo) {
+		this.taskInfo = taskInfo;
+	}
 }

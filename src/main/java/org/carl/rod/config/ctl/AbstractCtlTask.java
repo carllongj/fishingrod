@@ -1,5 +1,7 @@
 package org.carl.rod.config.ctl;
 
+import org.carl.rod.config.base.TaskConfiguration;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -33,8 +35,8 @@ public abstract class AbstractCtlTask extends AbstractTask implements TaskCtl {
 	public AbstractCtlTask() {
 	}
 
-	public AbstractCtlTask(String taskName) {
-		super(taskName);
+	public AbstractCtlTask(TaskConfiguration taskConfiguration) {
+		super(taskConfiguration);
 		this.filterList = new ArrayList<>();
 		this.taskOutputHandlers = new ArrayList<>();
 	}

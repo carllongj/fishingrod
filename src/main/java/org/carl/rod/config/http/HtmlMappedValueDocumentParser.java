@@ -53,7 +53,6 @@ class HtmlMappedValueDocumentParser implements DocumentParser {
 				}
 			}
 		}
-
-		return extractMap;
+		return new HttpMappedValue(extractMap);
 	}
 }

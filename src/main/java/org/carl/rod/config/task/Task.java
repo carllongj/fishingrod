@@ -1,5 +1,7 @@
 package org.carl.rod.config.task;
 
+import org.carl.rod.config.base.TaskConfiguration;
+
 /**
  * 标识当前为Task
  *
@@ -20,6 +22,13 @@ public interface Task {
 	 * @param taskName 设置任务名称
 	 */
 	void setTaskName(String taskName);
+
+	/**
+	 * 获取当前任务的配置信息
+	 *
+	 * @return 返回对应的配置信息
+	 */
+	TaskConfiguration getTaskConfiguration();
 
 	/**
 	 * 执行当前的任务,返回最终的执行结果

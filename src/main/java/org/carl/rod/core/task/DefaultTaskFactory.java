@@ -29,7 +29,12 @@ public class DefaultTaskFactory extends AbstractTaskFactory {
 		}
 	}
 
-
+	/**
+	 * 创建分页抓取和数据抓取的任务
+	 *
+	 * @param taskConfig 任务配置
+	 * @return 返回对应的任务信息
+	 */
 	protected Task doCreateStagedTask(TaskConfiguration taskConfig) {
 		String taskName;
 		if (Objects.nonNull(taskConfig.getTaskName())) {
@@ -39,13 +44,16 @@ public class DefaultTaskFactory extends AbstractTaskFactory {
 		}
 
 		DefaultPageRequestTask pageRequestTask
-			= new DefaultPageRequestTask(this.getTaskNameGenerator().generateTaskName(), taskConfig.getPageConfig());
+			= new DefaultPageRequestTask(taskConfig, taskConfig.getPageConfig());
+		pageRequestTask.setTaskName(taskName);
 		pageRequestTask.setUrl(taskConfig.getUrl());
 		pageRequestTask.setHttpMethod(taskConfig.getHttpMethod());
-		DefaultHttpRequestTask requestTask = new DefaultHttpRequestTask(this.getTaskNameGenerator().generateTaskName());
+		DefaultHttpRequestTask requestTask = new DefaultHttpRequestTask(taskConfig);
 		requestTask.setUrl(taskConfig.getUrl());
 		requestTask.setHttpMethod(taskConfig.getHttpMethod());
-		return new DefaultStagedTask(taskName, Arrays.asList(pageRequestTask, requestTask));
+		DefaultStagedTask stagedTask = new DefaultStagedTask(taskConfig, Arrays.asList(pageRequestTask, requestTask));
+		stagedTask.setTaskName(taskName);
+		return stagedTask;
 	}
 
 	/**
@@ -56,17 +64,18 @@ public class DefaultTaskFactory extends AbstractTaskFactory {
 	 */
 	protected Task doCreateSingleTask(TaskConfiguration taskConfig) {
 		String taskName;
-		if (Objects.nonNull(taskConfig.getTaskName())) {
-			taskName = taskConfig.getTaskName();
-		} else {
+		if (Objects.isNull(taskConfig.getTaskName())) {
 			taskName = this.getTaskNameGenerator().generateTaskName();
+		} else {
+			taskName = taskConfig.getTaskName();
 		}
-		DefaultHttpRequestTask requestTask = new DefaultHttpRequestTask(taskName);
+		DefaultHttpRequestTask requestTask = new DefaultHttpRequestTask(taskConfig);
+		requestTask.setTaskName(taskName);
 		requestTask.setUrl(taskConfig.getUrl());
 		requestTask.setHttpMethod(taskConfig.getHttpMethod());
+
 		if (null != taskConfig.getHttpConfig()) {
 			HttpRequestConfiguration httpConfig = taskConfig.getHttpConfig();
-
 			if (null != httpConfig.getHeaders()) {
 				for (Map.Entry<String, List<String>> entry : httpConfig.getHeaders().entrySet()) {
 					for (String value : entry.getValue()) {

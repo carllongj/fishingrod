@@ -11,7 +11,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 import java.io.Closeable;
-import java.net.URL;
 
 /**
  * @author longjie
@@ -52,12 +51,6 @@ public abstract class HttpComponentsUtils {
 	 * @param closeable 指定的可关闭流
 	 */
 	public static void closeHttpResourceQuietly(Closeable closeable) {
-		if (null != closeable) {
-			try {
-				closeable.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		CloseUtils.closeQuietly(closeable);
 	}
 }

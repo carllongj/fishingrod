@@ -23,6 +23,5 @@ public class DefaultConfigAdvice implements TaskCreatePostProcessor {
 		taskFactory.addDocumentCreator(new HttpDocumentCreator());
 		taskFactory.addTaskPostProcessor(new HttpTaskFactoryAdvice(taskFactory));
 		taskFactory.addTaskPostProcessor(new HttpMappedValueSupportAdvice());
-		//taskFactory.addFinishedHandler(new RetryHttpFinishedHandler());
 	}
 }

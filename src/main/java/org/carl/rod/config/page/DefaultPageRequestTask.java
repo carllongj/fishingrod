@@ -1,10 +1,10 @@
 package org.carl.rod.config.page;
 
 import org.carl.rod.config.RodException;
+import org.carl.rod.config.base.TaskConfiguration;
 import org.carl.rod.config.ctl.AbstractHttpParameterTask;
 import org.carl.rod.config.task.PageInfo;
 import org.carl.rod.core.http.DefaultHttpUriRequestWrapper;
-import org.carl.rod.core.http.HttpResponse;
 import org.carl.rod.core.http.HttpUriRequestWrapper;
 
 import java.util.ArrayList;
@@ -36,8 +36,8 @@ public class DefaultPageRequestTask extends AbstractHttpParameterTask implements
 		this.pageInfo = pageInfo;
 	}
 
-	public DefaultPageRequestTask(String taskName, PageInfo pageInfo) {
-		super(taskName);
+	public DefaultPageRequestTask(TaskConfiguration taskConfiguration, PageInfo pageInfo) {
+		super(taskConfiguration);
 		this.pageInfo = pageInfo;
 	}
 

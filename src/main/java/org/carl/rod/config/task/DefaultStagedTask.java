@@ -1,5 +1,6 @@
 package org.carl.rod.config.task;
 
+import org.carl.rod.config.base.TaskConfiguration;
 import org.carl.rod.config.ctl.AbstractHttpParameterTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +31,12 @@ public class DefaultStagedTask extends AbstractHttpParameterTask implements Stag
 		this.taskList = taskList;
 	}
 
-	public DefaultStagedTask(String taskName) {
-		super(taskName);
+	public DefaultStagedTask(TaskConfiguration taskConfiguration) {
+		super(taskConfiguration);
 	}
 
-	public DefaultStagedTask(String taskName, List<Task> taskList) {
-		super(taskName);
+	public DefaultStagedTask(TaskConfiguration taskConfiguration, List<Task> taskList) {
+		super(taskConfiguration);
 		this.taskList = taskList;
 	}
 
