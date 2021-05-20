@@ -1,5 +1,6 @@
 package org.carl.rod.config.http.url;
 
+import org.carl.rod.utils.CloseUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +67,8 @@ public class StreamLinesReader {
 		this.charset = charset;
 	}
 
+	// TODO: 2021/5/20 后续需要实现当前数据是位于哪一个文件中,或者此次返回的所有路径位于哪一些文件中
+
 	/**
 	 * 读取的指定行数的内容
 	 *
@@ -84,17 +87,8 @@ public class StreamLinesReader {
 
 		// 数据读取完毕,但是缓冲区中还存在内容
 		if (!canRead) {
-			return Collections.unmodifiableList(buffer);
+			return prepareReturn();
 		}
-
-		// 还需要读取的记录数
-		int needReadLines = specificLines;
-
-		// 若当前的缓冲区不为空,只需要读取一部分数据
-		if (!buffer.isEmpty()) {
-			needReadLines = specificLines - buffer.size();
-		}
-
 
 		// 当前文件数据读取完毕
 		if (Objects.isNull(specificLinesReader)) {
@@ -106,21 +100,23 @@ public class StreamLinesReader {
 					index++;
 				} else {
 					targetFile = path.toFile();
+					break;
 				}
 			}
-			// 没有文件了
+
+			// 没有文件了,检查buffer是否为null进行返回
 			if (Objects.isNull(targetFile)) {
-				return null;
+				return buffer.isEmpty() ? null : Collections.unmodifiableList(buffer);
 			}
-			Reader reader;
+
+			Reader reader = null;
 			try {
 				reader = new InputStreamReader(new FileInputStream(targetFile), this.charset);
 			} catch (FileNotFoundException e) {
 				// if happened,ignore file
 				//checked
-				index++;
-				specificLinesReader = null;
-				return readLines(needReadLines);
+				prepareNextFile();
+				return readLines(specificLines);
 			}
 
 			specificLinesReader = new SpecificLinesReader(new BufferedReader(reader));
@@ -129,17 +125,15 @@ public class StreamLinesReader {
 		// 准备执行返回数据
 		List<String> currentLines = null;
 		try {
-			currentLines = specificLinesReader.readSpecificLines(needReadLines);
+			currentLines = specificLinesReader.readSpecificLines(specificLines);
 		} catch (IOException e) {
-			index++;
-			specificLinesReader = null;
-			return readLines(needReadLines);
+			prepareNextFile();
+			return readLines(specificLines);
 		}
 
 		// 若仍然小于对应的读取记录数
 		if (currentLines.size() < specificLines) {
-			index++;
-			specificLinesReader = null;
+			prepareNextFile();
 			buffer.addAll(currentLines);
 			return readLines(specificLines - currentLines.size());
 		}
@@ -147,11 +141,26 @@ public class StreamLinesReader {
 		// 数据已经足够,将其加入到缓存中
 		buffer.addAll(currentLines);
 
-		// 构建集合不可变
-		List<String> urlList = Collections.unmodifiableList(buffer);
+		return prepareReturn();
+	}
 
-		//清空缓存
+	/**
+	 * 准备返回对应的数据并且清空缓存
+	 * @return 返回数据
+	 */
+	private List<String> prepareReturn() {
+		List<String> returnList = Collections.unmodifiableList(new ArrayList<>(buffer));
 		buffer.clear();
-		return urlList;
+		return returnList;
+	}
+
+	/**
+	 * 准备读取下一个文件
+	 */
+	private void prepareNextFile() {
+		this.index++;
+		//关闭当前的输入流
+		CloseUtils.closeQuietly(this.specificLinesReader);
+		this.specificLinesReader = null;
 	}
 }

@@ -14,6 +14,9 @@ import org.carl.rod.core.task.TaskPostProcessor;
  */
 public class HttpTaskFactoryAdvice implements TaskPostProcessor {
 
+	/**
+	 * 设置任务工厂
+	 */
 	private TaskFactory taskFactory;
 
 	public HttpTaskFactoryAdvice(TaskFactory taskFactory) {

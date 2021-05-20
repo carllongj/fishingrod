@@ -1,6 +1,7 @@
 package org.carl.rod.config.task;
 
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.carl.rod.config.http.url.GroupedUrlProvider;
 import org.carl.rod.core.http.HttpRequestExecutor;
 
 import java.util.List;
@@ -59,16 +60,16 @@ public interface HttpRequestTask extends Task {
 	/**
 	 * 指定当前任务的链接地址
 	 *
-	 * @param requestUrl 请求链接地址
+	 * @param urlProvider URL地址请求分组
 	 */
-	void setUrl(String requestUrl);
+	void setUrlProvider(GroupedUrlProvider urlProvider);
 
 	/**
 	 * 获取当前设置的根路径
 	 *
-	 * @return 返回对应的径地址
+	 * @return 获取当前路径地址
 	 */
-	String getUrl();
+	String getCurrentUrl();
 
 	/**
 	 * 设置当前的http客户端

@@ -1,6 +1,11 @@
 rod:
   # 接口使用的共同参数配置
   common:
+    # todo 后续用于支持数据库的处理
+    # jdbc:
+    #   url:
+    #   username:
+    #   password:
     output:
       path: "F:\\work\\file\\record"
       suffix: "result"
@@ -14,16 +19,20 @@ rod:
           - keep-alive
   task-info:
     - task-name: spider-main
-      # todo 此处需要扩展为url集合,可以通过一个url列表来检索多个url
       urls-provider:
         files:
           - "f:\\work\\a.file"
         urls:
           - http://www.sc.gov.cn/10462/10464/10797/2021/5/18/ebc8068529c246de8caa68bf450d4d4a.shtml
-        sql:
-          -
-        page-config:
-
+        # todo 后续用于支持数据库处理
+        # sql:
+        #   -
+        http-url:
+          page-config:
+            first-page: "page.html"
+            page-format: "page_%d.html"
+            page-url: "http://carllongj.github.io"
+          task-name:
       httpMethod: get
       selector:
         content:

@@ -13,12 +13,19 @@ import java.util.List;
  */
 class SpecificLinesReader extends BufferedReader {
 
-	private BufferedReader bufferedReader;
+	private final BufferedReader bufferedReader;
 
 	public SpecificLinesReader(BufferedReader in) {
 		super(in);
+		this.bufferedReader = in;
 	}
 
+	/**
+	 * 读取指定行数的数据,若在该次读取中已经读取完毕且不足 <param>specificLines</param>
+	 * @param specificLines 指定的行数
+	 * @return 返回读取到的数据
+	 * @throws IOException 出现IO异常
+	 */
 	public List<String> readSpecificLines(int specificLines) throws IOException {
 		List<String> list = new ArrayList<>(specificLines);
 		int count = 0;

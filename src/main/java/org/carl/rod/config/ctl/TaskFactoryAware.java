@@ -8,6 +8,10 @@ import org.carl.rod.core.task.TaskFactory;
  */
 public interface TaskFactoryAware {
 
+	/**
+	 * 设置任务工厂信息
+	 * @param taskFactory 任务工厂
+	 */
 	void setTaskFactory(TaskFactory taskFactory);
 
 }

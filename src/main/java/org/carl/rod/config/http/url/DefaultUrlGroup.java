@@ -20,6 +20,11 @@ public class DefaultUrlGroup implements UrlGroup {
 	 */
 	private List<String> urlGroup;
 
+	/**
+	 * 当前索引的位置
+	 */
+	private int index;
+
 	public DefaultUrlGroup() {
 	}
 
@@ -44,5 +49,15 @@ public class DefaultUrlGroup implements UrlGroup {
 	@Override
 	public List<String> getGroupUrl() {
 		return this.urlGroup;
+	}
+
+	@Override
+	public boolean hasNext() {
+		return index < urlGroup.size();
+	}
+
+	@Override
+	public String next() {
+		return urlGroup.get(index++);
 	}
 }

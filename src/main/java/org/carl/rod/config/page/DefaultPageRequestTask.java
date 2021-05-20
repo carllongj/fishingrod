@@ -3,6 +3,7 @@ package org.carl.rod.config.page;
 import org.carl.rod.config.RodException;
 import org.carl.rod.config.base.TaskConfiguration;
 import org.carl.rod.config.ctl.AbstractHttpParameterTask;
+import org.carl.rod.config.http.url.UrlGroup;
 import org.carl.rod.config.task.PageInfo;
 import org.carl.rod.core.http.DefaultHttpUriRequestWrapper;
 import org.carl.rod.core.http.HttpUriRequestWrapper;
@@ -14,6 +15,7 @@ import java.util.List;
  * @author longjie
  * 2021/5/13
  */
+@Deprecated
 public class DefaultPageRequestTask extends AbstractHttpParameterTask implements HttpPageRequestTask {
 
 	/**
@@ -50,7 +52,7 @@ public class DefaultPageRequestTask extends AbstractHttpParameterTask implements
 	}
 
 	@Override
-	protected List<HttpUriRequestWrapper> createTaskRequestList() {
+	protected List<HttpUriRequestWrapper> createTaskRequestList(UrlGroup urlGroup) {
 
 		if (null == pageInfo) {
 			// not happened
@@ -66,10 +68,5 @@ public class DefaultPageRequestTask extends AbstractHttpParameterTask implements
 		}
 
 		return httpUriRequests;
-	}
-
-	@Override
-	protected String getProvidedUri() {
-		return this.pageInfo.getPageUrl();
 	}
 }

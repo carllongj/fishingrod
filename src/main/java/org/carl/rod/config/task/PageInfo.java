@@ -1,5 +1,7 @@
 package org.carl.rod.config.task;
 
+import java.util.List;
+
 /**
  * @author longjie
  * 2021/5/10
@@ -27,6 +29,11 @@ public class PageInfo {
 	 * 当前的分页记录总数
 	 */
 	private Integer pageCount;
+
+	/**
+	 * 链接获取的 css 选择器
+	 */
+	private List<String> urlSelector;
 
 	public String getFirstPage() {
 		return firstPage;
@@ -58,5 +65,13 @@ public class PageInfo {
 
 	public void setPageCount(Integer pageCount) {
 		this.pageCount = pageCount;
+	}
+
+	public List<String> getUrlSelector() {
+		return urlSelector;
+	}
+
+	public void setUrlSelector(List<String> urlSelector) {
+		this.urlSelector = urlSelector;
 	}
 }

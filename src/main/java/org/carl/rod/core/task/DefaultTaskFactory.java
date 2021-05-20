@@ -46,10 +46,8 @@ public class DefaultTaskFactory extends AbstractTaskFactory {
 		DefaultPageRequestTask pageRequestTask
 			= new DefaultPageRequestTask(taskConfig, taskConfig.getPageConfig());
 		pageRequestTask.setTaskName(taskName);
-		pageRequestTask.setUrl(taskConfig.getUrl());
 		pageRequestTask.setHttpMethod(taskConfig.getHttpMethod());
 		DefaultHttpRequestTask requestTask = new DefaultHttpRequestTask(taskConfig);
-		requestTask.setUrl(taskConfig.getUrl());
 		requestTask.setHttpMethod(taskConfig.getHttpMethod());
 		DefaultStagedTask stagedTask = new DefaultStagedTask(taskConfig, Arrays.asList(pageRequestTask, requestTask));
 		stagedTask.setTaskName(taskName);
@@ -71,11 +69,11 @@ public class DefaultTaskFactory extends AbstractTaskFactory {
 		}
 		DefaultHttpRequestTask requestTask = new DefaultHttpRequestTask(taskConfig);
 		requestTask.setTaskName(taskName);
-		requestTask.setUrl(taskConfig.getUrl());
 		requestTask.setHttpMethod(taskConfig.getHttpMethod());
-
+		// 获取http的配置
 		if (null != taskConfig.getHttpConfig()) {
 			HttpRequestConfiguration httpConfig = taskConfig.getHttpConfig();
+			//请求头配置
 			if (null != httpConfig.getHeaders()) {
 				for (Map.Entry<String, List<String>> entry : httpConfig.getHeaders().entrySet()) {
 					for (String value : entry.getValue()) {
@@ -84,6 +82,7 @@ public class DefaultTaskFactory extends AbstractTaskFactory {
 				}
 			}
 
+			// 请求参数配置
 			if (null != httpConfig.getParameters()) {
 				for (Map.Entry<String, List<String>> entry : httpConfig.getParameters().entrySet()) {
 					for (String value : entry.getValue()) {

@@ -22,9 +22,9 @@ public class TaskConfiguration {
 	private PageInfo pageConfig;
 
 	/**
-	 * http 请求url设置
+	 * 获取URL配置
 	 */
-	private String url;
+	private UrlProviderConfiguration urlProvider;
 
 	/**
 	 * http请求方法设置
@@ -62,12 +62,12 @@ public class TaskConfiguration {
 		this.pageConfig = pageConfig;
 	}
 
-	public String getUrl() {
-		return url;
+	public UrlProviderConfiguration getUrlProvider() {
+		return urlProvider;
 	}
 
-	public void setUrl(String url) {
-		this.url = url;
+	public void setUrlProvider(UrlProviderConfiguration urlProvider) {
+		this.urlProvider = urlProvider;
 	}
 
 	public String getHttpMethod() {

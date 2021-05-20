@@ -6,6 +6,8 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.carl.rod.config.base.TaskConfiguration;
+import org.carl.rod.config.http.url.GroupedUrlProvider;
+import org.carl.rod.config.http.url.UrlGroup;
 import org.carl.rod.config.task.HttpRequestTask;
 import org.carl.rod.config.task.TaskAware;
 import org.carl.rod.core.http.DefaultHttpUriRequestWrapper;
@@ -24,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,14 +58,24 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 	private volatile Map<String, List<String>> requestParameters;
 
 	/**
-	 * 访问链接地址的根路径
+	 * 页面抓取的地址链接集合
 	 */
-	private String baseUrl;
+	private GroupedUrlProvider urlProvider;
 
 	/**
-	 * http 请求路径
+	 * 当前处理链接的根地址链接
 	 */
-	private String url;
+	private String currentBaseUrl;
+
+	/**
+	 * 当前的URL分组
+	 */
+	private UrlGroup currentGroup;
+
+	/**
+	 * 处理的当前数据链接
+	 */
+	private String currentUrl;
 
 	/**
 	 * http请求客户端
@@ -144,17 +155,6 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 	}
 
 	@Override
-	public void setUrl(String requestUrl) {
-		this.url = requestUrl;
-		this.baseUrl = StringUtils.extractHttpBaseUrl(url);
-	}
-
-	@Override
-	public String getUrl() {
-		return url;
-	}
-
-	@Override
 	public void setHttpComponent(CloseableHttpClient httpComponent) {
 		this.httpClient = httpComponent;
 	}
@@ -188,75 +188,100 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 
 	private boolean doExecuteTask() {
 		//获取当前任务所有需要执行的请求
-		List<HttpUriRequestWrapper> taskRequestList = createTaskRequestList();
+		while (urlProvider.hasNext()) {
 
-		if (Objects.isNull(taskRequestList) || taskRequestList.isEmpty()) {
-			LOGGER.warn("Task {} is ignored", this.getTaskName());
-			return true;
+			// 获取当前的一组url记录
+			UrlGroup urlGroup = urlProvider.next();
+
+			// 根据当前的链接地址,创建对应的请求任务列表
+			List<HttpUriRequestWrapper> taskRequestList = createTaskRequestList(urlGroup);
+
+			if (Objects.isNull(taskRequestList) || taskRequestList.isEmpty()) {
+				LOGGER.warn("Task {} is ignored", this.getTaskName());
+				return true;
+			}
+
+			// 进行过滤请求
+			List<HttpUriRequestWrapper> requestWrappers = filterUrl(taskRequestList);
+
+			for (HttpUriRequestWrapper request : requestWrappers) {
+
+				//记录当前处理的链接相关信息
+				this.currentGroup = urlGroup;
+				this.currentUrl = request.getOriginUri();
+				this.currentBaseUrl = StringUtils.extractHttpBaseUrl(currentUrl);
+
+				if (Objects.nonNull(taskFactory)) {
+					List<TaskPostProcessor> processor = this.taskFactory.getTaskPostProcessor();
+					for (TaskPostProcessor postProcessor : processor) {
+						if (postProcessor instanceof TaskPreHandlePostProcessor) {
+							((TaskPreHandlePostProcessor) postProcessor).preHandle(this, request);
+						}
+					}
+				}
+
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("start to execute Task : {} ,url : {}", getTaskName(), request.getOriginUri());
+				}
+
+				// 执行http请求
+				HttpResponse response = this.httpExecutor.
+					executeHttpRequest(this.getHttpClient(), request,
+						taskFactory.getHttpFinishedHandler());
+
+				if (Objects.isNull(response)) {
+					LOGGER.warn("task {} for uri {} without response", this.getTaskName(), request.getOriginUri());
+					return false;
+				}
+
+				Document doc = this.taskFactory.createDocument(
+					createTargetSource(request, response));
+
+				if (null == doc) {
+					throw new NoSuitableDocumentCreatorException("no suitable Document Creator for task %s", this.getTaskName());
+				}
+
+				// 获取到所有提取到的集合
+				Object extractValue = this.getTaskInput().handle(doc);
+
+				// 设置当前的任务信息
+				if (extractValue instanceof TaskAware) {
+					((TaskAware) extractValue).setTask(this);
+				}
+
+				for (TaskOutputHandler taskOutputHandler : this.getTaskOutputHandler()) {
+					if (taskOutputHandler.isSupport(extractValue)) {
+						try {
+							taskOutputHandler.handleOutput(extractValue);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+
+				if (Objects.nonNull(taskFactory)) {
+					List<TaskPostProcessor> processor = this.taskFactory.getTaskPostProcessor();
+					for (TaskPostProcessor taskPostProcessor : processor) {
+						if (taskPostProcessor instanceof TaskAfterHandlePostProcessor) {
+							((TaskAfterHandlePostProcessor) taskPostProcessor).afterHandle(this);
+						}
+					}
+				}
+			}
 		}
 
-		// 进行过滤请求
-		List<HttpUriRequestWrapper> requestWrappers = filterUrl(taskRequestList);
-
-		for (HttpUriRequestWrapper request : requestWrappers) {
-			if (Objects.nonNull(taskFactory)) {
-				List<TaskPostProcessor> processor = this.taskFactory.getTaskPostProcessor();
-				for (TaskPostProcessor postProcessor : processor) {
-					if (postProcessor instanceof TaskPreHandlePostProcessor) {
-						((TaskPreHandlePostProcessor) postProcessor).preHandle(this, request);
-					}
-				}
-			}
-
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("start to execute Task : {} ,url : {}", getTaskName(), request.getOriginUri());
-			}
-
-			// 执行http请求
-			HttpResponse response = this.httpExecutor.
-				executeHttpRequest(this.getHttpClient(), request,
-					taskFactory.getHttpFinishedHandler());
-
-			if (Objects.isNull(response)) {
-				LOGGER.warn("task {} for uri {} without response", this.getTaskName(), request.getOriginUri());
-				return false;
-			}
-
-			Document doc = this.taskFactory.createDocument(
-				createTargetSource(request, response));
-
-			if (null == doc) {
-				throw new NoSuitableDocumentCreatorException("no suitable Document Creator for task %s", this.getTaskName());
-			}
-
-			// 获取到所有提取到的集合
-			Object extractValue = this.getTaskInput().handle(doc);
-
-			// 设置当前的任务信息
-			if (extractValue instanceof TaskAware) {
-				((TaskAware) extractValue).setTask(this);
-			}
-
-			for (TaskOutputHandler taskOutputHandler : this.getTaskOutputHandler()) {
-				if (taskOutputHandler.isSupport(extractValue)) {
-					try {
-						taskOutputHandler.handleOutput(extractValue);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-
-			if (Objects.nonNull(taskFactory)) {
-				List<TaskPostProcessor> processor = this.taskFactory.getTaskPostProcessor();
-				for (TaskPostProcessor taskPostProcessor : processor) {
-					if (taskPostProcessor instanceof TaskAfterHandlePostProcessor) {
-						((TaskAfterHandlePostProcessor) taskPostProcessor).afterHandle(this);
-					}
-				}
-			}
-		}
+		cleanTask();
 		return true;
+	}
+
+	@Override
+	public void setUrlProvider(GroupedUrlProvider urlProvider) {
+		this.urlProvider = urlProvider;
+	}
+
+	@Override
+	public String getCurrentUrl() {
+		return this.currentUrl;
 	}
 
 	/**
@@ -309,17 +334,23 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 	 * @return 返回子类提供的基础路径
 	 */
 	protected String getProvidedUri() {
-		return this.url;
+		return this.currentUrl;
 	}
 
 	/**
 	 * 创建默认的任务请求数据队列
 	 *
+	 * @param urlGroup  url分组
 	 * @return 返回所有的任务列表
 	 */
-	protected List<HttpUriRequestWrapper> createTaskRequestList() {
-		return Collections.singletonList(new DefaultHttpUriRequestWrapper(
-			getProvidedUri(), buildHttpRequest(getProvidedUri())));
+	protected List<HttpUriRequestWrapper> createTaskRequestList(UrlGroup urlGroup) {
+		List<HttpUriRequestWrapper> requestUrls = new ArrayList<>();
+		// 构建当前分组的请求对象
+		for (String url : urlGroup.getGroupUrl()) {
+			requestUrls.add(new DefaultHttpUriRequestWrapper(
+				url, buildHttpRequest(url)));
+		}
+		return requestUrls;
 	}
 
 	/**
@@ -351,9 +382,18 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 			}
 		}
 
-		//钩子
+		//勾子
 		this.prePostRequestBuilder(builder);
 		return builder.build();
+	}
+
+	/**
+	 * 清空当前Task的缓存
+	 */
+	protected void cleanTask() {
+		this.currentBaseUrl = null;
+		this.currentUrl = null;
+		this.currentGroup = null;
 	}
 
 	/**

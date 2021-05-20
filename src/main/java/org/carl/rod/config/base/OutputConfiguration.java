@@ -88,8 +88,4 @@ public class OutputConfiguration {
 			INSTANCE.suffix = "record";
 		}
 	}
-	/**
-	 * 创建默认的配置对象
-	 */
-
 }

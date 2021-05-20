@@ -1,12 +1,13 @@
 package org.carl.rod.config.http.url;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * @author longjie
  * 2021/5/19
  */
-public interface UrlGroup {
+public interface UrlGroup extends Iterator<String> {
 
 	/**
 	 * 获取当前的分组编号

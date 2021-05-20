@@ -1,6 +1,5 @@
 package org.carl.rod.config.http.url;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -17,15 +16,13 @@ public class FilesUrlProvider extends AbstractGroupedUrlProvider {
 	private List<String> files;
 
 	/**
-	 * 记录当前索引到的文件索引
+	 *
 	 */
-	private int index;
+	private List<String> urls = Collections.emptyList();
 
 	/**
-	 * 当前的文件集合缓存
+	 * 文件流式读取
 	 */
-	private List<String> buffer = new ArrayList<>();
-
 	private StreamLinesReader linesReader;
 
 	public FilesUrlProvider() {
@@ -43,23 +40,20 @@ public class FilesUrlProvider extends AbstractGroupedUrlProvider {
 
 	@Override
 	protected List<String> urlsGroup() {
-		List<String> urlList = Collections.unmodifiableList(buffer);
-		buffer.clear();
-		return urlList;
+		return this.urls;
 	}
 
 	@Override
 	public boolean hasNext() {
-		if (null == buffer) {
+		if (null == urls) {
 			return false;
-		} else {
-			List<String> lines = linesReader.readLines(getGroupSize());
-			if (Objects.isNull(lines)) {
-				return false;
-			} else {
-				this.buffer.addAll(lines);
-				return true;
-			}
 		}
+		// 尝试读取指定分组大小的数据列表
+		List<String> lines = this.linesReader.readLines(getGroupSize());
+		if (Objects.isNull(lines)) {
+			return false;
+		}
+		this.urls = lines;
+		return true;
 	}
 }
