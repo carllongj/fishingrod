@@ -10,6 +10,19 @@ import java.util.regex.Pattern;
  */
 public abstract class StringUtils {
 
+	/**
+	 * 空字符串
+	 */
+	public static final String EMPTY = "";
+
+	/**
+	 * 换行符
+	 */
+	public static final char LINE_SEPARATOR = '\n';
+
+	/**
+	 * 中画线分隔符
+	 */
 	private static final char STRIKE_THROUGH = '-';
 
 	/**

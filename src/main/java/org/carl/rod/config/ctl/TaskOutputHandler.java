@@ -1,5 +1,7 @@
 package org.carl.rod.config.ctl;
 
+import org.carl.rod.config.task.HttpRequestTask;
+
 /**
  * @author longjie
  * 2021/5/13
@@ -17,7 +19,8 @@ public interface TaskOutputHandler {
 	/**
 	 * 执行数据的输出处理
 	 *
+	 * @param task   当前任务
 	 * @param target 输入数据的处理结果
 	 */
-	void handleOutput(Object target) throws Exception;
+	void handleOutput(HttpRequestTask task, Object target) throws Exception;
 }

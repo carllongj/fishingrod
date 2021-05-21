@@ -4,12 +4,16 @@ import org.apache.commons.codec.Charsets;
 import org.carl.rod.config.base.OutputConfiguration;
 import org.carl.rod.config.base.TaskConfiguration;
 import org.carl.rod.config.ctl.TaskOutputHandler;
+import org.carl.rod.config.http.url.FilesUrlProvider;
+import org.carl.rod.config.page.HttpPageRequestTask;
+import org.carl.rod.config.task.HttpRequestTask;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Collections;
 
 /**
  * @author longjie
@@ -31,7 +35,7 @@ public abstract class AbstractFileOutputFormatHandler implements TaskOutputHandl
 	}
 
 	@Override
-	public void handleOutput(Object target) throws Exception {
+	public void handleOutput(HttpRequestTask requestTask, Object target) throws Exception {
 		HttpMappedValue result = (HttpMappedValue) target;
 
 		// 格式化对应的数据
@@ -44,7 +48,7 @@ public abstract class AbstractFileOutputFormatHandler implements TaskOutputHandl
 		OutputConfiguration output = taskConfiguration.getOutput();
 
 		//执行输出
-		doOutput(formatLine, output);
+		doOutput(requestTask, formatLine, output);
 	}
 
 	/**
@@ -53,10 +57,21 @@ public abstract class AbstractFileOutputFormatHandler implements TaskOutputHandl
 	 * @param formatLine          格式化完成的文本内容
 	 * @param outputConfiguration 输出配置信息
 	 */
-	protected void doOutput(String formatLine, OutputConfiguration outputConfiguration) throws IOException {
+	protected void doOutput(HttpRequestTask requestTask, String formatLine, OutputConfiguration outputConfiguration) throws IOException {
+
+		// 当前任务的输出路径地址
 		Path path = this.buildOutputPath(outputConfiguration.getPath(), outputConfiguration.getFileName(), outputConfiguration.getSuffix());
+		// 执行数据写出
 		Files.write(path, formatLine.getBytes(Charsets.toCharset(outputConfiguration.getCharset())),
 			StandardOpenOption.CREATE, StandardOpenOption.APPEND, StandardOpenOption.WRITE);
+
+		// 设置任务的路径提供器
+		if (null != requestTask.getParent() &&
+			requestTask instanceof HttpPageRequestTask &&
+			requestTask.getParent() instanceof HttpRequestTask) {
+			((HttpRequestTask) requestTask.getParent()).addLast(
+				new FilesUrlProvider(Collections.singletonList(path.toString())));
+		}
 	}
 
 	protected abstract String formatLine(HttpMappedValue result);

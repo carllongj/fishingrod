@@ -1,6 +1,7 @@
 package org.carl.rod.config.task;
 
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.carl.rod.config.http.url.ConfigurableGroupedUrlProvider;
 import org.carl.rod.config.http.url.GroupedUrlProvider;
 import org.carl.rod.core.http.HttpRequestExecutor;
 
@@ -11,7 +12,7 @@ import java.util.Map;
  * @author longjie
  * 2021/5/13
  */
-public interface HttpRequestTask extends Task {
+public interface HttpRequestTask extends Task, HierarchicalTask, ConfigurableGroupedUrlProvider {
 
 	/**
 	 * 获取当前任务参数的请求头
@@ -98,4 +99,11 @@ public interface HttpRequestTask extends Task {
 	 * @return 返回对应的请求执行器
 	 */
 	HttpRequestExecutor getHttpExecutor();
+
+	/**
+	 * 设置当前任务的父任务
+	 *
+	 * @param parent 父任务
+	 */
+	void setParent(Task parent);
 }

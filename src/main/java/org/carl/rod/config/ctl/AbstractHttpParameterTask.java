@@ -6,9 +6,12 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.carl.rod.config.base.TaskConfiguration;
+import org.carl.rod.config.http.url.CompositeGroupedUrlProvider;
 import org.carl.rod.config.http.url.GroupedUrlProvider;
 import org.carl.rod.config.http.url.UrlGroup;
 import org.carl.rod.config.task.HttpRequestTask;
+import org.carl.rod.config.task.StagedTask;
+import org.carl.rod.config.task.Task;
 import org.carl.rod.config.task.TaskAware;
 import org.carl.rod.core.http.DefaultHttpUriRequestWrapper;
 import org.carl.rod.core.http.HttpRequestExecutor;
@@ -86,6 +89,11 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 	 * Http 请求执行器
 	 */
 	private HttpRequestExecutor httpExecutor;
+
+	/**
+	 * 当前任务的父任务
+	 */
+	private Task parent;
 
 	/**
 	 * 当前的任务创建工厂
@@ -175,6 +183,16 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 	}
 
 	@Override
+	public void setParent(Task parent) {
+		this.parent = parent;
+	}
+
+	@Override
+	public Task getParent() {
+		return parent;
+	}
+
+	@Override
 	public final boolean executeTask() {
 		long start = System.currentTimeMillis();
 		if (LOGGER.isDebugEnabled()) {
@@ -186,7 +204,26 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 		return result;
 	}
 
+	/**
+	 * 执行任务
+	 *
+	 * @return 返回是否执行成功
+	 */
 	private boolean doExecuteTask() {
+
+		// 若当前是阶段性任务执行
+		if (this instanceof StagedTask) {
+			// 优先执行其内部任务
+			List<Task> tasks = ((StagedTask) this).getStagedTasks();
+			if (Objects.nonNull(tasks) && !tasks.isEmpty()) {
+				for (Task task : tasks) {
+					if (!task.executeTask()) {
+						return false;
+					}
+				}
+			}
+		}
+
 		//获取当前任务所有需要执行的请求
 		while (urlProvider.hasNext()) {
 
@@ -252,18 +289,20 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 				for (TaskOutputHandler taskOutputHandler : this.getTaskOutputHandler()) {
 					if (taskOutputHandler.isSupport(extractValue)) {
 						try {
-							taskOutputHandler.handleOutput(extractValue);
+							taskOutputHandler.handleOutput(this, extractValue);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}
 				}
 
+				onTaskFinish();
+
 				if (Objects.nonNull(taskFactory)) {
 					List<TaskPostProcessor> processor = this.taskFactory.getTaskPostProcessor();
 					for (TaskPostProcessor taskPostProcessor : processor) {
 						if (taskPostProcessor instanceof TaskAfterHandlePostProcessor) {
-							((TaskAfterHandlePostProcessor) taskPostProcessor).afterHandle(this);
+							((TaskAfterHandlePostProcessor) taskPostProcessor).afterHandle(this, this.taskFactory);
 						}
 					}
 				}
@@ -274,9 +313,31 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 		return true;
 	}
 
+	/**
+	 * 当前任务结束之后,子类实现其自定义的逻辑
+	 */
+	protected void onTaskFinish() {
+	}
+
 	@Override
 	public void setUrlProvider(GroupedUrlProvider urlProvider) {
 		this.urlProvider = urlProvider;
+	}
+
+	@Override
+	public void addLast(GroupedUrlProvider groupedUrlProvider) {
+		// TODO: 2021/5/21 当任务在运行时,应当不允许新增URLProvider
+		if (this.urlProvider instanceof CompositeGroupedUrlProvider) {
+			((CompositeGroupedUrlProvider) urlProvider).addLast(groupedUrlProvider);
+		}
+	}
+
+	@Override
+	public void addFirst(GroupedUrlProvider groupedUrlProvider) {
+		// TODO: 2021/5/21 当任务在运行时,应当不允许新增URLProvider
+		if (this.urlProvider instanceof CompositeGroupedUrlProvider) {
+			((CompositeGroupedUrlProvider) urlProvider).addFirst(groupedUrlProvider);
+		}
 	}
 
 	@Override
@@ -340,7 +401,7 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 	/**
 	 * 创建默认的任务请求数据队列
 	 *
-	 * @param urlGroup  url分组
+	 * @param urlGroup url分组
 	 * @return 返回所有的任务列表
 	 */
 	protected List<HttpUriRequestWrapper> createTaskRequestList(UrlGroup urlGroup) {

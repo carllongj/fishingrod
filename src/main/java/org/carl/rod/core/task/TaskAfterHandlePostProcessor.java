@@ -8,5 +8,11 @@ import org.carl.rod.config.task.Task;
  */
 public interface TaskAfterHandlePostProcessor extends TaskPostProcessor {
 
-	void afterHandle(Task task);
+	/**
+	 * 后置操作
+	 *
+	 * @param task        当前执行的任务
+	 * @param taskFactory 任务工厂
+	 */
+	void afterHandle(Task task, TaskFactory taskFactory);
 }

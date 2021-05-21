@@ -1,5 +1,7 @@
 package org.carl.rod.config.http;
 
+import org.carl.rod.utils.StringUtils;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -49,7 +51,7 @@ public class JsonFormatOutputHandler extends AbstractFileOutputFormatHandler {
 	protected String formatLine(HttpMappedValue result) {
 		Map<String, String> extractMap = result.getExtractMap();
 		if (Objects.isNull(extractMap) || extractMap.isEmpty()) {
-			return null;
+			return StringUtils.EMPTY;
 		}
 
 		StringBuilder sb = new StringBuilder(DEFAULT_BUFFER_LENGTH);

@@ -21,6 +21,13 @@ public class ConfigurationUrlProvider extends AbstractGroupedUrlProvider {
 	 */
 	private int currentRecord;
 
+	public ConfigurationUrlProvider() {
+	}
+
+	public ConfigurationUrlProvider(List<String> urlList) {
+		this.urlList = urlList;
+	}
+
 	/**
 	 * 存储从配置文件中获取的链接列表
 	 *
