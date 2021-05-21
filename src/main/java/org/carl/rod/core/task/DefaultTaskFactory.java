@@ -1,31 +1,41 @@
 package org.carl.rod.core.task;
 
 import org.carl.rod.config.base.HttpRequestConfiguration;
+import org.carl.rod.config.base.HttpUrlConfiguration;
 import org.carl.rod.config.base.TaskConfiguration;
+import org.carl.rod.config.base.UrlProviderConfiguration;
+import org.carl.rod.config.http.PageUrlFileOutputFormatHandler;
+import org.carl.rod.config.http.url.CompositeGroupedUrlProvider;
+import org.carl.rod.config.http.url.ConfigurationUrlProvider;
+import org.carl.rod.config.http.url.FilesUrlProvider;
+import org.carl.rod.config.http.url.GroupedUrlProvider;
+import org.carl.rod.config.http.url.PageRequestUrlProvider;
 import org.carl.rod.config.page.DefaultPageRequestTask;
+import org.carl.rod.config.page.HttpPageRequestTask;
 import org.carl.rod.config.task.DefaultHttpRequestTask;
 import org.carl.rod.config.task.DefaultStagedTask;
-import org.carl.rod.config.task.PageInfo;
+import org.carl.rod.config.task.HttpRequestTask;
 import org.carl.rod.config.task.Task;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author longjie
  * 2021/5/13
  */
-public class DefaultTaskFactory extends AbstractTaskFactory {
+public class DefaultTaskFactory extends AbstractHttpTaskFactory {
 
 	@Override
 	protected Task doCreateTask(TaskConfiguration taskConfig) {
-		PageInfo pageConfig = taskConfig.getPageConfig();
-		if (null == pageConfig) {
-			return doCreateSingleTask(taskConfig);
-		} else {
+		if (Optional.of(taskConfig).map(TaskConfiguration::getUrlsProvider).map(UrlProviderConfiguration::getHttpUrl).isPresent()) {
 			return doCreateStagedTask(taskConfig);
+		} else {
+			return doCreateSingleTask(taskConfig);
 		}
 	}
 
@@ -43,16 +53,63 @@ public class DefaultTaskFactory extends AbstractTaskFactory {
 			taskName = this.getTaskNameGenerator().generateTaskName();
 		}
 
-		DefaultPageRequestTask pageRequestTask
-			= new DefaultPageRequestTask(taskConfig, taskConfig.getPageConfig());
-		pageRequestTask.setTaskName(taskName);
-		pageRequestTask.setHttpMethod(taskConfig.getHttpMethod());
-		DefaultHttpRequestTask requestTask = new DefaultHttpRequestTask(taskConfig);
-		requestTask.setHttpMethod(taskConfig.getHttpMethod());
-		DefaultStagedTask stagedTask = new DefaultStagedTask(taskConfig, Arrays.asList(pageRequestTask, requestTask));
-		stagedTask.setTaskName(taskName);
-		return stagedTask;
+		// 获取URL路径配置
+		UrlProviderConfiguration urlProviderConfiguration = taskConfig.getUrlsProvider();
+		Objects.requireNonNull(urlProviderConfiguration, "url-provider can not be null");
+
+		HttpUrlConfiguration urlConfiguration = urlProviderConfiguration.getHttpUrl();
+
+		//创建分页的任务
+		DefaultPageRequestTask pageRequestTask = new DefaultPageRequestTask(urlConfiguration.getPageConfig());
+		pageRequestTask.setTaskName(urlConfiguration.getTaskName());
+		pageRequestTask.setHttpMethod(urlConfiguration.getHttpMethod());
+
+		// 设置分页参数信息
+		PageRequestUrlProvider pageRequestUrlProvider = new PageRequestUrlProvider();
+		pageRequestUrlProvider.setPageStrategy(pageRequestTask.getPageStrategy());
+		pageRequestTask.setUrlProvider(pageRequestUrlProvider);
+
+		// 任务数据输出任务
+		pageRequestTask.addTaskOutputHandler(new PageUrlFileOutputFormatHandler());
+
+		DefaultHttpRequestTask task = new DefaultHttpRequestTask();
+		task.setTaskName(taskName);
+		task.setHttpMethod(taskConfig.getHttpMethod());
+
+		DefaultStagedTask targetTask = new DefaultStagedTask(Arrays.asList(pageRequestTask, task));
+		targetTask.setTaskName(taskName);
+		targetTask.setHttpMethod(taskConfig.getHttpMethod());
+
+		List<Task> stagedTasks = targetTask.getStagedTasks();
+		for (Task childTask : stagedTasks) {
+			if (childTask instanceof HttpPageRequestTask) {
+				((HttpPageRequestTask) childTask).setParent(targetTask);
+			}
+		}
+		// 创建对应的url提供器
+		doCreateUrlProvider(targetTask, urlProviderConfiguration);
+		return targetTask;
 	}
+
+	/**
+	 * 创建默认的URLProvider
+	 *
+	 * @param task                     当前的任务
+	 * @param urlProviderConfiguration urlProvider 配置项
+	 */
+	private void doCreateUrlProvider(Task task, UrlProviderConfiguration urlProviderConfiguration) {
+		if (task instanceof HttpRequestTask) {
+			List<GroupedUrlProvider> providers = new ArrayList<>();
+			if (Objects.nonNull(urlProviderConfiguration.getUrls()) && urlProviderConfiguration.getUrls().size() > 0) {
+				providers.add(new ConfigurationUrlProvider(urlProviderConfiguration.getUrls()));
+			}
+			if (Objects.nonNull(urlProviderConfiguration.getFiles()) && urlProviderConfiguration.getFiles().size() > 0) {
+				providers.add(new FilesUrlProvider(urlProviderConfiguration.getFiles()));
+			}
+			((HttpRequestTask) task).setUrlProvider(new CompositeGroupedUrlProvider(providers));
+		}
+	}
+
 
 	/**
 	 * 创建单个默认任务

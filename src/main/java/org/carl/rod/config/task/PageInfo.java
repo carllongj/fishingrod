@@ -1,12 +1,14 @@
 package org.carl.rod.config.task;
 
+import org.carl.rod.core.task.PageConfig;
+
 import java.util.List;
 
 /**
  * @author longjie
  * 2021/5/10
  */
-public class PageInfo {
+public class PageInfo implements PageConfig {
 
 	/**
 	 * 首页的链接地址
@@ -35,6 +37,11 @@ public class PageInfo {
 	 */
 	private List<String> urlSelector;
 
+	@Override
+	public int getTotalPages() {
+		return 0;
+	}
+
 	public String getFirstPage() {
 		return firstPage;
 	}
@@ -43,6 +50,7 @@ public class PageInfo {
 		this.firstPage = firstPage;
 	}
 
+	@Override
 	public String getPageFormat() {
 		return pageFormat;
 	}
@@ -51,6 +59,7 @@ public class PageInfo {
 		this.pageFormat = pageFormat;
 	}
 
+	@Override
 	public String getPageUrl() {
 		return pageUrl;
 	}
@@ -67,6 +76,7 @@ public class PageInfo {
 		this.pageCount = pageCount;
 	}
 
+	@Override
 	public List<String> getUrlSelector() {
 		return urlSelector;
 	}

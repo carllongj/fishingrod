@@ -11,23 +11,30 @@ import org.carl.rod.config.task.Task;
 import org.carl.rod.core.http.doc.DocumentCreator;
 import org.carl.rod.core.http.handlers.HttpFinishedHandler;
 import org.carl.rod.core.name.TaskNameGenerator;
+import org.carl.rod.core.task.definition.HttpTaskDefinition;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
  * @author longjie
  * 2021/5/13
  */
-public abstract class AbstractTaskFactory implements TaskFactory {
+public abstract class AbstractHttpTaskFactory implements HttpTaskFactory {
 
 	/**
 	 * 任务处理
 	 */
 	private List<TaskPostProcessor> taskPostProcessors;
+
+	/**
+	 * 外部配置信息
+	 */
+	private RodBaseConfiguration configuration;
 
 	/**
 	 * 任务回调器
@@ -44,10 +51,22 @@ public abstract class AbstractTaskFactory implements TaskFactory {
 	 */
 	private TaskNameGenerator taskNameGenerator;
 
-	public AbstractTaskFactory() {
+	/**
+	 * 创建任务的定义映射
+	 */
+	private Map<String, HttpTaskDefinition> definitionMap;
+
+	/**
+	 * 已经创建好的任务集合
+	 */
+	private Map<String, Task> createdTask;
+
+	public AbstractHttpTaskFactory() {
 		this.taskPostProcessors = new ArrayList<>();
 		this.documentCreators = new ArrayList<>();
 		this.finishedHandlers = new ArrayList<>();
+		this.definitionMap = new LinkedHashMap<>();
+		this.createdTask = new LinkedHashMap<>();
 	}
 
 	@Override
@@ -96,33 +115,52 @@ public abstract class AbstractTaskFactory implements TaskFactory {
 	}
 
 	@Override
-	public List<Task> createTask(RodBaseConfiguration configuration) {
-		if (null == configuration) {
-			return Collections.emptyList();
-		}
-
-		return doCreateTasks(configuration.getRod());
+	public void registerTaskDefinition(HttpTaskDefinition taskDefinition) {
+		this.definitionMap.put(taskDefinition.getTaskName(), taskDefinition);
 	}
 
-	private List<Task> doCreateTasks(DefaultConfiguration rod) {
+	@Override
+	public void setRodBaseConfiguration(RodBaseConfiguration configuration) {
+		this.configuration = configuration;
+	}
+
+	@Override
+	public List<Task> createAllTask() {
+		if (Objects.isNull(configuration)) {
+			return Collections.emptyList();
+		}
+		doCreateTasks(configuration.getRod());
+		return Collections.unmodifiableList(new ArrayList<>(this.createdTask.values()));
+	}
+
+	/**
+	 * 执行创建对应的任务
+	 *
+	 * @param rod 配置信息
+	 * @return 返回所有的任务对象
+	 */
+	private void doCreateTasks(DefaultConfiguration rod) {
 		List<TaskConfiguration> taskInfo = rod.getTaskInfo();
 
 		// 若当前配置项中未进行设置任务信息
 		if (Objects.isNull(taskInfo) || taskInfo.isEmpty()) {
-			return Collections.emptyList();
+			return;
 		}
-
-		List<Task> taskList = new LinkedList<>();
 
 		// 遍历所有的任务
 		for (TaskConfiguration taskConfiguration : taskInfo) {
+
+			// 当前任务已经被创建
+			if (createdTask.containsKey(taskConfiguration.getTaskName())) {
+				continue;
+			}
+
 			// 合并参数配置项
 			if (null != rod.getCommon()) {
 				generateTaskConfiguration(rod.getCommon(), taskConfiguration);
 			}
 
 			for (int i = 0; i < taskPostProcessors.size(); i++) {
-
 				TaskPostProcessor processor = taskPostProcessors.get(i);
 				if (processor instanceof TaskCreatePostProcessor) {
 					((TaskCreatePostProcessor) processor).beforeCreateTask(this, taskConfiguration);
@@ -137,10 +175,9 @@ public abstract class AbstractTaskFactory implements TaskFactory {
 				task = taskPostProcessors.get(i).postProcess(task, taskConfiguration);
 			}
 
-			// 添加任务
-			taskList.add(task);
+			// 存储当前的任务
+			this.createdTask.put(task.getTaskName(), task);
 		}
-		return taskList;
 	}
 
 	/**
@@ -204,8 +241,8 @@ public abstract class AbstractTaskFactory implements TaskFactory {
 	/**
 	 * 创建任务
 	 *
-	 * @param taskConfig 执行创建任务
+	 * @param taskDefinition 当前任务的配置信息
 	 * @return 返回创建完成的任务
 	 */
-	protected abstract Task doCreateTask(TaskConfiguration taskConfig);
+	protected abstract Task doCreateTask(TaskConfiguration taskDefinition);
 }

@@ -1,6 +1,6 @@
 package org.carl.rod.config.ctl;
 
-import org.carl.rod.core.task.TaskFactory;
+import org.carl.rod.core.task.HttpTaskFactory;
 
 /**
  * @author longjie
@@ -10,8 +10,9 @@ public interface TaskFactoryAware {
 
 	/**
 	 * 设置任务工厂信息
+	 *
 	 * @param taskFactory 任务工厂
 	 */
-	void setTaskFactory(TaskFactory taskFactory);
+	void setTaskFactory(HttpTaskFactory taskFactory);
 
 }

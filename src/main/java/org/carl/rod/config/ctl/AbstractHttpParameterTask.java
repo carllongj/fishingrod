@@ -19,8 +19,8 @@ import org.carl.rod.core.http.HttpResponse;
 import org.carl.rod.core.http.HttpUriRequestWrapper;
 import org.carl.rod.core.http.doc.HttpResponseComposite;
 import org.carl.rod.core.http.doc.NoSuitableDocumentCreatorException;
+import org.carl.rod.core.task.HttpTaskFactory;
 import org.carl.rod.core.task.TaskAfterHandlePostProcessor;
-import org.carl.rod.core.task.TaskFactory;
 import org.carl.rod.core.task.TaskPostProcessor;
 import org.carl.rod.core.task.TaskPreHandlePostProcessor;
 import org.carl.rod.utils.StringUtils;
@@ -98,7 +98,7 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 	/**
 	 * 当前的任务创建工厂
 	 */
-	private TaskFactory taskFactory;
+	private HttpTaskFactory taskFactory;
 
 	public AbstractHttpParameterTask() {
 		this.requestHeaders = new LinkedHashMap<>();
@@ -122,7 +122,7 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 	}
 
 	@Override
-	public void setTaskFactory(TaskFactory taskFactory) {
+	public void setTaskFactory(HttpTaskFactory taskFactory) {
 		this.taskFactory = taskFactory;
 	}
 
@@ -192,6 +192,15 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 		return parent;
 	}
 
+	/**
+	 * 尝试获取当前的任务工厂
+	 *
+	 * @return 返回当前的任务工厂
+	 */
+	private HttpTaskFactory getHttpTaskFactory() {
+		return this.taskFactory;
+	}
+
 	@Override
 	public final boolean executeTask() {
 		long start = System.currentTimeMillis();
@@ -224,6 +233,11 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 			}
 		}
 
+		if (Objects.isNull(urlProvider)) {
+			LOGGER.warn("task {} has no urlProvider", this.getTaskName());
+			return true;
+		}
+
 		//获取当前任务所有需要执行的请求
 		while (urlProvider.hasNext()) {
 
@@ -248,14 +262,13 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 				this.currentUrl = request.getOriginUri();
 				this.currentBaseUrl = StringUtils.extractHttpBaseUrl(currentUrl);
 
-				if (Objects.nonNull(taskFactory)) {
-					List<TaskPostProcessor> processor = this.taskFactory.getTaskPostProcessor();
-					for (TaskPostProcessor postProcessor : processor) {
-						if (postProcessor instanceof TaskPreHandlePostProcessor) {
-							((TaskPreHandlePostProcessor) postProcessor).preHandle(this, request);
-						}
+				List<TaskPostProcessor> processor = this.getHttpTaskFactory().getTaskPostProcessor();
+				for (TaskPostProcessor postProcessor : processor) {
+					if (postProcessor instanceof TaskPreHandlePostProcessor) {
+						((TaskPreHandlePostProcessor) postProcessor).preHandle(this, request);
 					}
 				}
+
 
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("start to execute Task : {} ,url : {}", getTaskName(), request.getOriginUri());
@@ -264,14 +277,14 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 				// 执行http请求
 				HttpResponse response = this.httpExecutor.
 					executeHttpRequest(this.getHttpClient(), request,
-						taskFactory.getHttpFinishedHandler());
+						getHttpTaskFactory().getHttpFinishedHandler());
 
 				if (Objects.isNull(response)) {
 					LOGGER.warn("task {} for uri {} without response", this.getTaskName(), request.getOriginUri());
 					return false;
 				}
 
-				Document doc = this.taskFactory.createDocument(
+				Document doc = this.getHttpTaskFactory().createDocument(
 					createTargetSource(request, response));
 
 				if (null == doc) {
@@ -298,12 +311,10 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 
 				onTaskFinish();
 
-				if (Objects.nonNull(taskFactory)) {
-					List<TaskPostProcessor> processor = this.taskFactory.getTaskPostProcessor();
-					for (TaskPostProcessor taskPostProcessor : processor) {
-						if (taskPostProcessor instanceof TaskAfterHandlePostProcessor) {
-							((TaskAfterHandlePostProcessor) taskPostProcessor).afterHandle(this, this.taskFactory);
-						}
+				List<TaskPostProcessor> afterProcessor = getHttpTaskFactory().getTaskPostProcessor();
+				for (TaskPostProcessor taskPostProcessor : afterProcessor) {
+					if (taskPostProcessor instanceof TaskAfterHandlePostProcessor) {
+						((TaskAfterHandlePostProcessor) taskPostProcessor).afterHandle(this, this.getHttpTaskFactory());
 					}
 				}
 			}

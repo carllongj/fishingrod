@@ -7,6 +7,8 @@ import org.carl.rod.config.ctl.TaskOutputHandler;
 import org.carl.rod.config.http.url.FilesUrlProvider;
 import org.carl.rod.config.page.HttpPageRequestTask;
 import org.carl.rod.config.task.HttpRequestTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,6 +22,9 @@ import java.util.Collections;
  * 2021/5/18
  */
 public abstract class AbstractFileOutputFormatHandler implements TaskOutputHandler {
+
+	// 日志
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractFileOutputFormatHandler.class);
 
 	/**
 	 * 后缀名称分隔符
@@ -61,6 +66,9 @@ public abstract class AbstractFileOutputFormatHandler implements TaskOutputHandl
 
 		// 当前任务的输出路径地址
 		Path path = this.buildOutputPath(outputConfiguration.getPath(), outputConfiguration.getFileName(), outputConfiguration.getSuffix());
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("task {} write output in file {}", requestTask.getTaskName(), path.toString());
+		}
 		// 执行数据写出
 		Files.write(path, formatLine.getBytes(Charsets.toCharset(outputConfiguration.getCharset())),
 			StandardOpenOption.CREATE, StandardOpenOption.APPEND, StandardOpenOption.WRITE);

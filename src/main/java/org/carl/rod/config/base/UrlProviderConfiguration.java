@@ -16,8 +16,6 @@
 
 package org.carl.rod.config.base;
 
-import org.carl.rod.config.task.PageInfo;
-
 import java.util.List;
 
 /**
@@ -41,7 +39,7 @@ public class UrlProviderConfiguration {
 	/**
 	 * 用以配置通过抓取Http页面的配置信息
 	 */
-	private PageInfo config;
+	private HttpUrlConfiguration httpUrl;
 
 	public List<String> getUrls() {
 		return urls;
@@ -59,11 +57,11 @@ public class UrlProviderConfiguration {
 		this.files = files;
 	}
 
-	public PageInfo getConfig() {
-		return config;
+	public HttpUrlConfiguration getHttpUrl() {
+		return httpUrl;
 	}
 
-	public void setConfig(PageInfo config) {
-		this.config = config;
+	public void setHttpUrl(HttpUrlConfiguration httpUrl) {
+		this.httpUrl = httpUrl;
 	}
 }

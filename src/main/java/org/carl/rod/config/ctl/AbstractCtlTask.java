@@ -3,6 +3,7 @@ package org.carl.rod.config.ctl;
 import org.carl.rod.config.base.TaskConfiguration;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,12 +34,14 @@ public abstract class AbstractCtlTask extends AbstractTask implements TaskCtl {
 	private Boolean enablePathFilter;
 
 	public AbstractCtlTask() {
+		this.filterList = new ArrayList<>();
+		this.taskOutputHandlers = new LinkedList<>();
 	}
 
 	public AbstractCtlTask(TaskConfiguration taskConfiguration) {
 		super(taskConfiguration);
 		this.filterList = new ArrayList<>();
-		this.taskOutputHandlers = new ArrayList<>();
+		this.taskOutputHandlers = new LinkedList<>();
 	}
 
 	@Override

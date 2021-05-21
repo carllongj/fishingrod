@@ -20,21 +20,25 @@ rod:
   task-info:
     - task-name: spider-main
       urls-provider:
-        files:
-          - "f:\\work\\a.file"
-        urls:
-          - http://www.sc.gov.cn/10462/10464/10797/2021/5/18/ebc8068529c246de8caa68bf450d4d4a.shtml
+        #files:
+        #  - "f:\\work\\a.file"
+        #urls:
+        #  - http://www.sc.gov.cn/10462/10464/10797/2021/5/18/ebc8068529c246de8caa68bf450d4d4a.shtml
         # todo 后续用于支持数据库处理
         # sql:
         #   -
         http-url:
           page-config:
-            first-page: "page.html"
-            page-format: "page_%d.html"
-            page-url: "http://carllongj.github.io"
-          task-name:
+            first-page: "jrsc_list.shtml"
+            page-format: "jrsc_list_%d.html"
+            page-url: "http://www.sc.gov.cn/10462/10464/10797/"
+            page-count: 15
+            url-selector:
+              - "#dash-table tr td span a"
+          task-name: page-spider
+          httpMethod: get
       httpMethod: get
-      selector:
+      selectors:
         content:
           - "#articlecontent ucaptitle"
         time:

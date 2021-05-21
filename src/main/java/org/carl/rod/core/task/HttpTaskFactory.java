@@ -6,6 +6,7 @@ import org.carl.rod.config.task.Task;
 import org.carl.rod.core.http.doc.DocumentCreator;
 import org.carl.rod.core.http.handlers.HttpFinishedHandler;
 import org.carl.rod.core.name.TaskNameGenerator;
+import org.carl.rod.core.task.definition.HttpTaskDefinitionRegistry;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
  * @author longjie
  * 2021/5/13
  */
-public interface TaskFactory {
+public interface HttpTaskFactory extends HttpTaskDefinitionRegistry {
 
 	/**
 	 * 名称生成器
@@ -30,12 +31,18 @@ public interface TaskFactory {
 	TaskNameGenerator getTaskNameGenerator();
 
 	/**
-	 * 创建任务
+	 * 设置当前配置文件对应的配置项
 	 *
-	 * @param configuration 所有的配置项
-	 * @return 返回创建完成的所有task集合
+	 * @param configuration 配置项
 	 */
-	List<Task> createTask(RodBaseConfiguration configuration);
+	void setRodBaseConfiguration(RodBaseConfiguration configuration);
+
+	/**
+	 * 创建所有的任务集合
+	 *
+	 * @return 返回创建完成的任务集合
+	 */
+	List<Task> createAllTask();
 
 	/**
 	 * 添加任务处理器

@@ -14,5 +14,5 @@ public interface TaskAfterHandlePostProcessor extends TaskPostProcessor {
 	 * @param task        当前执行的任务
 	 * @param taskFactory 任务工厂
 	 */
-	void afterHandle(Task task, TaskFactory taskFactory);
+	void afterHandle(Task task, HttpTaskFactory taskFactory);
 }

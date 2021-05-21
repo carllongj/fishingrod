@@ -1,7 +1,5 @@
 package org.carl.rod.config.base;
 
-import org.carl.rod.config.task.PageInfo;
-
 import java.util.List;
 import java.util.Map;
 
@@ -17,14 +15,9 @@ public class TaskConfiguration {
 	private String taskName;
 
 	/**
-	 * 进行分页查询任务设置
-	 */
-	private PageInfo pageConfig;
-
-	/**
 	 * 获取URL配置
 	 */
-	private UrlProviderConfiguration urlProvider;
+	private UrlProviderConfiguration urlsProvider;
 
 	/**
 	 * http请求方法设置
@@ -34,7 +27,7 @@ public class TaskConfiguration {
 	/**
 	 * 选择器映射
 	 */
-	private Map<String, List<String>> selector;
+	private Map<String, List<String>> selectors;
 
 	/**
 	 * 输出数据配置
@@ -54,20 +47,12 @@ public class TaskConfiguration {
 		this.taskName = taskName;
 	}
 
-	public PageInfo getPageConfig() {
-		return pageConfig;
+	public UrlProviderConfiguration getUrlsProvider() {
+		return urlsProvider;
 	}
 
-	public void setPageConfig(PageInfo pageConfig) {
-		this.pageConfig = pageConfig;
-	}
-
-	public UrlProviderConfiguration getUrlProvider() {
-		return urlProvider;
-	}
-
-	public void setUrlProvider(UrlProviderConfiguration urlProvider) {
-		this.urlProvider = urlProvider;
+	public void setUrlsProvider(UrlProviderConfiguration urlsProvider) {
+		this.urlsProvider = urlsProvider;
 	}
 
 	public String getHttpMethod() {
@@ -86,12 +71,12 @@ public class TaskConfiguration {
 		this.httpConfig = httpConfig;
 	}
 
-	public Map<String, List<String>> getSelector() {
-		return selector;
+	public Map<String, List<String>> getSelectors() {
+		return selectors;
 	}
 
-	public void setSelector(Map<String, List<String>> selector) {
-		this.selector = selector;
+	public void setSelectors(Map<String, List<String>> selectors) {
+		this.selectors = selectors;
 	}
 
 	public OutputConfiguration getOutput() {

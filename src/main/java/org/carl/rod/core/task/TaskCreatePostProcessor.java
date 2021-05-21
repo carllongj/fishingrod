@@ -11,8 +11,8 @@ public interface TaskCreatePostProcessor extends TaskPostProcessor {
 	/**
 	 * 执行创建对应的Task任务之前,修改和配置当前的TaskConfiguration
 	 *
-	 * @param taskFactory   任务创建工厂
-	 * @param configuration 创建任务参数信息
+	 * @param taskFactory       任务创建工厂
+	 * @param taskConfiguration 创建任务参数信息
 	 */
-	void beforeCreateTask(TaskFactory taskFactory, TaskConfiguration configuration);
+	void beforeCreateTask(HttpTaskFactory taskFactory, TaskConfiguration taskConfiguration);
 }
