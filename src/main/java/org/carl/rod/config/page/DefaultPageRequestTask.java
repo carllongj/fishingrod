@@ -2,7 +2,11 @@ package org.carl.rod.config.page;
 
 import org.carl.rod.config.base.TaskConfiguration;
 import org.carl.rod.config.ctl.AbstractHttpParameterTask;
+import org.carl.rod.config.task.HttpRequestTask;
 import org.carl.rod.config.task.PageInfo;
+import org.carl.rod.core.http.HttpRequestExecutor;
+
+import java.util.Objects;
 
 /**
  * @author longjie
@@ -41,5 +45,14 @@ public class DefaultPageRequestTask extends AbstractHttpParameterTask implements
 			this.pageStrategy = new PageFormatStrategy(pageInfo);
 		}
 		return pageStrategy;
+	}
+
+	@Override
+	public HttpRequestExecutor getHttpExecutor() {
+		if (Objects.nonNull(this.getParent())) {
+			return ((HttpRequestTask) this.getParent()).getHttpExecutor();
+		} else {
+			return super.getHttpExecutor();
+		}
 	}
 }

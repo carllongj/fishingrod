@@ -76,9 +76,10 @@ public class DefaultTaskFactory extends AbstractHttpTaskFactory {
 		task.setTaskName(taskName);
 		task.setHttpMethod(taskConfig.getHttpMethod());
 
-		DefaultStagedTask targetTask = new DefaultStagedTask(Arrays.asList(pageRequestTask, task));
+		DefaultStagedTask targetTask = new DefaultStagedTask(taskConfig, Arrays.asList(pageRequestTask, task));
 		targetTask.setTaskName(taskName);
 		targetTask.setHttpMethod(taskConfig.getHttpMethod());
+
 
 		List<Task> stagedTasks = targetTask.getStagedTasks();
 		for (Task childTask : stagedTasks) {

@@ -2,6 +2,7 @@ package org.carl.rod.config.http;
 
 import org.carl.rod.utils.StringUtils;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -13,13 +14,15 @@ public class PageUrlFileOutputFormatHandler extends AbstractFileOutputFormatHand
 
 	@Override
 	protected String formatLine(HttpMappedValue result) {
-		Map<String, String> extractMap = result.getExtractMap();
+		Map<String, List<String>> extractMap = result.getExtractMap();
 		if (Objects.isNull(extractMap) || extractMap.isEmpty()) {
 			return StringUtils.EMPTY;
 		}
 		StringBuilder sb = new StringBuilder();
-		for (Map.Entry<String, String> entry : extractMap.entrySet()) {
-			sb.append(entry.getValue()).append(StringUtils.LINE_SEPARATOR);
+		for (Map.Entry<String, List<String>> entry : extractMap.entrySet()) {
+			for (String entryValue : entry.getValue()) {
+				sb.append(entryValue).append(StringUtils.LINE_SEPARATOR);
+			}
 		}
 
 		if (sb.length() > 0) {

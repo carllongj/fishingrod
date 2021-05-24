@@ -3,7 +3,6 @@ package org.carl.rod.core.advice;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.carl.rod.config.base.TaskConfiguration;
 import org.carl.rod.config.task.HttpRequestTask;
-import org.carl.rod.config.task.StagedTask;
 import org.carl.rod.config.task.Task;
 import org.carl.rod.core.http.HttpRequestExecutor;
 import org.carl.rod.core.task.TaskPostProcessor;
@@ -34,14 +33,7 @@ public class HttpComponentAdvice implements TaskPostProcessor {
 
 	@Override
 	public Task postProcess(Task task, TaskConfiguration taskConfiguration) {
-		if (task instanceof StagedTask) {
-			for (Task childTask : ((StagedTask) task).getStagedTasks()) {
-				if (childTask instanceof HttpRequestTask) {
-					((HttpRequestTask) childTask).setHttpComponent(this.httpClient);
-					((HttpRequestTask) childTask).setHttpExecutor(this.requestExecutor);
-				}
-			}
-		} else if (task instanceof HttpRequestTask) {
+		if (task instanceof HttpRequestTask) {
 			((HttpRequestTask) task).setHttpComponent(this.httpClient);
 			((HttpRequestTask) task).setHttpExecutor(this.requestExecutor);
 		}

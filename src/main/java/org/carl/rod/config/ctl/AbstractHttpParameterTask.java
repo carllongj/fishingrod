@@ -9,6 +9,7 @@ import org.carl.rod.config.base.TaskConfiguration;
 import org.carl.rod.config.http.url.CompositeGroupedUrlProvider;
 import org.carl.rod.config.http.url.GroupedUrlProvider;
 import org.carl.rod.config.http.url.UrlGroup;
+import org.carl.rod.config.task.AbstractHierarchicalCtlTask;
 import org.carl.rod.config.task.HttpRequestTask;
 import org.carl.rod.config.task.StagedTask;
 import org.carl.rod.config.task.Task;
@@ -38,7 +39,7 @@ import java.util.Objects;
  * @author longjie
  * 2021/5/13
  */
-public abstract class AbstractHttpParameterTask extends AbstractCtlTask implements HttpRequestTask, TaskFactoryAware {
+public abstract class AbstractHttpParameterTask extends AbstractHierarchicalCtlTask implements HttpRequestTask, TaskFactoryAware {
 
 	/**
 	 * 日志对象
@@ -169,7 +170,11 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 
 	@Override
 	public CloseableHttpClient getHttpClient() {
-		return httpClient;
+		if (Objects.nonNull(getParent())) {
+			return ((AbstractHttpParameterTask) getParent()).getHttpClient();
+		} else {
+			return this.httpClient;
+		}
 	}
 
 	@Override
@@ -179,7 +184,11 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 
 	@Override
 	public HttpRequestExecutor getHttpExecutor() {
-		return httpExecutor;
+		if (Objects.nonNull(this.getParent())) {
+			return ((HttpRequestTask) this.getParent()).getHttpExecutor();
+		} else {
+			return this.httpExecutor;
+		}
 	}
 
 	@Override
@@ -198,7 +207,11 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 	 * @return 返回当前的任务工厂
 	 */
 	private HttpTaskFactory getHttpTaskFactory() {
-		return this.taskFactory;
+		if (Objects.nonNull(this.getParent())) {
+			return ((AbstractHttpParameterTask) this.getParent()).getHttpTaskFactory();
+		} else {
+			return this.taskFactory;
+		}
 	}
 
 	@Override
@@ -275,7 +288,7 @@ public abstract class AbstractHttpParameterTask extends AbstractCtlTask implemen
 				}
 
 				// 执行http请求
-				HttpResponse response = this.httpExecutor.
+				HttpResponse response = this.getHttpExecutor().
 					executeHttpRequest(this.getHttpClient(), request,
 						getHttpTaskFactory().getHttpFinishedHandler());
 

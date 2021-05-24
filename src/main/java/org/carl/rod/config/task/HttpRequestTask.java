@@ -12,7 +12,7 @@ import java.util.Map;
  * @author longjie
  * 2021/5/13
  */
-public interface HttpRequestTask extends Task, HierarchicalTask, ConfigurableGroupedUrlProvider {
+public interface HttpRequestTask extends HierarchicalTask, ConfigurableGroupedUrlProvider {
 
 	/**
 	 * 获取当前任务参数的请求头

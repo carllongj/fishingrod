@@ -3,6 +3,7 @@ package org.carl.rod.config.http;
 import org.carl.rod.config.task.Task;
 import org.carl.rod.config.task.TaskAware;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,21 +20,21 @@ public class HttpMappedValue implements TaskAware {
 	/**
 	 * 提取完成的数据结果记录
 	 */
-	private Map<String, String> extractMap;
+	private Map<String, List<String>> extractMap;
 
 	public HttpMappedValue() {
 	}
 
-	public HttpMappedValue(Map<String, String> extractMap) {
+	public HttpMappedValue(Map<String, List<String>> extractMap) {
 		this.extractMap = extractMap;
 	}
 
-	public Map<String, String> getExtractMap() {
+	public void setExtractMap(Map<String, List<String>> extractMap) {
+		this.extractMap = extractMap;
+	}
+
+	public Map<String, List<String>> getExtractMap() {
 		return extractMap;
-	}
-
-	public void setExtractMap(Map<String, String> extractMap) {
-		this.extractMap = extractMap;
 	}
 
 	public Task getRequestTask() {

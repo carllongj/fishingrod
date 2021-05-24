@@ -11,8 +11,14 @@ import java.util.Objects;
  */
 public abstract class AbstractTask implements Task {
 
+	/**
+	 * 当前的任务名称
+	 */
 	private String taskName;
 
+	/**
+	 * 当前的任务配置
+	 */
 	private TaskConfiguration taskConfiguration;
 
 	public AbstractTask() {

@@ -3,10 +3,12 @@ package org.carl.rod.config.http;
 import org.carl.rod.config.ctl.Document;
 import org.carl.rod.core.http.DocumentParser;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +39,7 @@ class HtmlMappedValueDocumentParser implements DocumentParser {
 		}
 
 		// 结果采集的
-		Map<String, String> extractMap = new LinkedHashMap<>();
+		Map<String, List<String>> extractMap = new LinkedHashMap<>();
 
 		nextValue:
 		for (Map.Entry<String, List<String>> entry : selectorMap.entrySet()) {
@@ -47,10 +49,14 @@ class HtmlMappedValueDocumentParser implements DocumentParser {
 					continue;
 				}
 
-				if (elements.size() == 1) {
-					extractMap.put(entry.getKey(), elements.get(0).text());
-					continue nextValue;
+				// 创建默认的提取Value
+				List<String> extractValue = extractMap.getOrDefault(entry.getKey(), new ArrayList<>());
+
+				for (Element ele : elements) {
+					extractValue.add(ele.text());
 				}
+
+				extractMap.putIfAbsent(entry.getKey(), extractValue);
 			}
 		}
 		return new HttpMappedValue(extractMap);
