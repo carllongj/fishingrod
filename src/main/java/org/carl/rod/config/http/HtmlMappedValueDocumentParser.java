@@ -41,7 +41,6 @@ class HtmlMappedValueDocumentParser implements DocumentParser {
 		// 结果采集的
 		Map<String, List<String>> extractMap = new LinkedHashMap<>();
 
-		nextValue:
 		for (Map.Entry<String, List<String>> entry : selectorMap.entrySet()) {
 			for (String selection : entry.getValue()) {
 				Elements elements = document.select(selection);
@@ -53,12 +52,23 @@ class HtmlMappedValueDocumentParser implements DocumentParser {
 				List<String> extractValue = extractMap.getOrDefault(entry.getKey(), new ArrayList<>());
 
 				for (Element ele : elements) {
-					extractValue.add(ele.text());
+					extractValue.add(extractValue(ele, realDocument));
 				}
 
 				extractMap.putIfAbsent(entry.getKey(), extractValue);
 			}
 		}
 		return new HttpMappedValue(extractMap);
+	}
+
+	/**
+	 * 提取当前元素的文本内容
+	 *
+	 * @param element      当前元素信息
+	 * @param httpDocument 当前的文档对象
+	 * @return 返回提取的结果
+	 */
+	protected String extractValue(Element element, HttpDocument httpDocument) {
+		return element.text();
 	}
 }

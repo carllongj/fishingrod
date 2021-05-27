@@ -18,7 +18,7 @@ public class HttpMappedValueTaskInputHandler implements TaskInputHandler {
 	/**
 	 * 对于Html页面的选择器
 	 */
-	private Map<String, List<String>> selectors;
+	protected Map<String, List<String>> selectors;
 
 	public void setSelectors(Map<String, List<String>> selectors) {
 		this.selectors = selectors;

@@ -1,5 +1,6 @@
 package org.carl.rod.http;
 
+import org.apache.http.ProtocolVersion;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -61,5 +62,19 @@ public class HttpClientResponseTest {
 	public void executeHttpRequest() {
 		HttpUriRequest build = RequestBuilder.create("GET").setUri("https://carllongj.github.io").build();
 		System.out.println(build);
+	}
+
+	@Test
+	public void connect() throws IOException {
+		HttpUriRequest build = RequestBuilder.create("GET")
+			.setVersion(new ProtocolVersion("HTTP", 1, 1))
+			.setUri("http://www.chengdu.gov.cn/chengdu/zfxx/fzgh.shtml")
+			.addHeader("Host", "www.chengdu.gov.cn")
+			.addHeader("User-Agent", "curl/7.58.0")
+			.addHeader("Accept", "*/*")
+			.build();
+
+		CloseableHttpResponse response = httpClient.execute(build);
+		System.out.println(response.getStatusLine().getStatusCode());
 	}
 }

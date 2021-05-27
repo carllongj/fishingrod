@@ -6,6 +6,7 @@ import org.carl.rod.config.ctl.TaskOutputHandler;
 import org.carl.rod.config.http.HttpMappedValueTaskInputHandler;
 import org.carl.rod.config.http.JsonFormatOutputHandler;
 import org.carl.rod.config.http.PageUrlFileOutputFormatHandler;
+import org.carl.rod.config.http.PageUrlHttpMappedValueTaskInputHandler;
 import org.carl.rod.config.page.HttpPageRequestTask;
 import org.carl.rod.config.task.HttpRequestTask;
 import org.carl.rod.config.task.StagedTask;
@@ -42,12 +43,12 @@ public class HttpMappedValueSupportAdvice implements TaskPostProcessor {
 				for (Task childTask : ((StagedTask) task).getStagedTasks()) {
 					if (childTask instanceof TaskCtl) {
 						if (childTask instanceof HttpPageRequestTask) {
-							HttpMappedValueTaskInputHandler handler = new HttpMappedValueTaskInputHandler();
+							HttpMappedValueTaskInputHandler handler = new PageUrlHttpMappedValueTaskInputHandler();
 							Map<String, List<String>> selectorMap =
-								Collections.singletonMap(PAGE_URL_KEY, taskConfiguration.getUrlsProvider().getHttpUrl().getPageConfig().getUrlSelector());
+								Collections.singletonMap(PAGE_URL_KEY, taskConfiguration.getUrlsProvider().
+									getHttpUrl().getPageConfig().getUrlSelector());
 							handler.setSelectors(selectorMap);
 							((TaskCtl) childTask).setTaskInput(handler);
-
 							((TaskCtl) childTask).addTaskOutputHandler(new PageUrlFileOutputFormatHandler());
 						}
 
@@ -57,7 +58,8 @@ public class HttpMappedValueSupportAdvice implements TaskPostProcessor {
 								((TaskCtl) childTask).setTaskInput(targetTask.getTaskInput());
 							}
 
-							if (Objects.isNull(((TaskCtl) childTask).getTaskOutputHandler()) && !targetTask.getTaskOutputHandler().isEmpty()) {
+							if (Objects.isNull(((TaskCtl) childTask).getTaskOutputHandler()) &&
+								!targetTask.getTaskOutputHandler().isEmpty()) {
 								for (TaskOutputHandler taskOutputHandler : targetTask.getTaskOutputHandler()) {
 									((TaskCtl) childTask).addTaskOutputHandler(taskOutputHandler);
 								}

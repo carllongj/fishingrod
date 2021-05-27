@@ -50,6 +50,7 @@ public abstract class AbstractFileOutputFormatHandler implements TaskOutputHandl
 		TaskConfiguration taskConfiguration = result.getRequestTask().getTaskConfiguration();
 
 		// 获取输出配置信息
+		// TODO: 2021/5/27 处理子任务会往父级别输出定义中输出结果
 		OutputConfiguration output = taskConfiguration.getOutput();
 
 		//执行输出

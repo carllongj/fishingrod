@@ -24,10 +24,6 @@ public class PageUrlFileOutputFormatHandler extends AbstractFileOutputFormatHand
 				sb.append(entryValue).append(StringUtils.LINE_SEPARATOR);
 			}
 		}
-
-		if (sb.length() > 0) {
-			return sb.deleteCharAt(sb.length() - 1).toString();
-		}
-		return StringUtils.EMPTY;
+		return sb.toString();
 	}
 }

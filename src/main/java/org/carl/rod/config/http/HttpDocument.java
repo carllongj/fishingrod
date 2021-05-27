@@ -10,6 +10,13 @@ import java.nio.charset.Charset;
  */
 public interface HttpDocument extends Document {
 
+	String HTTP_PROTOCOL_NAME = "http";
+
+	/**
+	 * 绝对路径开头
+	 */
+	String ABSOLUTE_PATH = "/";
+
 	/**
 	 * 获取原始
 	 *
