@@ -45,12 +45,6 @@ public abstract class AbstractHttpParameterTask extends AbstractHierarchicalCtlT
 	 * 日志对象
 	 */
 	protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractHttpParameterTask.class);
-
-	/**
-	 * 当前任务的请求方法
-	 */
-	private String httpMethod;
-
 	/**
 	 * 当前任务的请求方法头
 	 */
@@ -155,12 +149,12 @@ public abstract class AbstractHttpParameterTask extends AbstractHierarchicalCtlT
 
 	@Override
 	public void setHttpMethod(String httpMethod) {
-		this.httpMethod = httpMethod;
+		this.getTaskConfiguration().setHttpMethod(httpMethod);
 	}
 
 	@Override
 	public String getHttpMethod() {
-		return this.httpMethod;
+		return this.getTaskConfiguration().getHttpMethod();
 	}
 
 	@Override
@@ -445,7 +439,7 @@ public abstract class AbstractHttpParameterTask extends AbstractHierarchicalCtlT
 	 * @return 返回对应的Http请求方法
 	 */
 	protected HttpUriRequest buildHttpRequest(String url) {
-		RequestBuilder builder = RequestBuilder.create(httpMethod.toUpperCase())
+		RequestBuilder builder = RequestBuilder.create(this.getHttpMethod().toUpperCase())
 			.setUri(url)
 			.setCharset(StandardCharsets.UTF_8);
 		Map<String, List<String>> requestHeaders = this.getRequestHeaders();

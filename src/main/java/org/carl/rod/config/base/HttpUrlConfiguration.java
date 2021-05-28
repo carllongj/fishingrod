@@ -23,6 +23,11 @@ public class HttpUrlConfiguration {
 	 */
 	private String httpMethod;
 
+	/**
+	 * 输出配置信息
+	 */
+	private OutputConfiguration outputConfiguration;
+
 	public PageInfo getPageConfig() {
 		return pageConfig;
 	}
@@ -45,5 +50,13 @@ public class HttpUrlConfiguration {
 
 	public void setHttpMethod(String httpMethod) {
 		this.httpMethod = httpMethod;
+	}
+
+	public OutputConfiguration getOutputConfiguration() {
+		return outputConfiguration;
+	}
+
+	public void setOutputConfiguration(OutputConfiguration outputConfiguration) {
+		this.outputConfiguration = outputConfiguration;
 	}
 }

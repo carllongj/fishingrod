@@ -1,0 +1,11 @@
+temp: &temp
+  key: key1
+  value: value1
+
+apk:
+  data: clear
+  <<: *temp
+
+ios:
+  data: ios
+  <<: *temp

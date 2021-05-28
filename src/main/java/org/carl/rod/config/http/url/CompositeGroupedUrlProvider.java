@@ -89,8 +89,8 @@ public class CompositeGroupedUrlProvider extends AbstractGroupedUrlProvider impl
 
 
 		if (!groupedUrlProvider.hasNext()) {
-			while (indexGroup < urlProviders.size()) {
-				groupedUrlProvider = urlProviders.get(++indexGroup);
+			while (++indexGroup < urlProviders.size()) {
+				groupedUrlProvider = urlProviders.get(indexGroup);
 				if (groupedUrlProvider.hasNext()) {
 					return true;
 				}

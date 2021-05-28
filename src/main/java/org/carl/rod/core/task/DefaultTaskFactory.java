@@ -2,6 +2,7 @@ package org.carl.rod.core.task;
 
 import org.carl.rod.config.base.HttpRequestConfiguration;
 import org.carl.rod.config.base.HttpUrlConfiguration;
+import org.carl.rod.config.base.OutputConfiguration;
 import org.carl.rod.config.base.TaskConfiguration;
 import org.carl.rod.config.base.UrlProviderConfiguration;
 import org.carl.rod.config.http.PageUrlFileOutputFormatHandler;
@@ -59,10 +60,9 @@ public class DefaultTaskFactory extends AbstractHttpTaskFactory {
 
 		HttpUrlConfiguration urlConfiguration = urlProviderConfiguration.getHttpUrl();
 
+		TaskConfiguration pageConfiguration = createPageRequestTaskConfiguration(taskConfig);
 		//创建分页的任务
-		DefaultPageRequestTask pageRequestTask = new DefaultPageRequestTask(urlConfiguration.getPageConfig());
-		pageRequestTask.setTaskName(urlConfiguration.getTaskName());
-		pageRequestTask.setHttpMethod(urlConfiguration.getHttpMethod());
+		DefaultPageRequestTask pageRequestTask = new DefaultPageRequestTask(pageConfiguration, urlConfiguration.getPageConfig());
 
 		// 设置分页参数信息
 		PageRequestUrlProvider pageRequestUrlProvider = new PageRequestUrlProvider();
@@ -72,9 +72,8 @@ public class DefaultTaskFactory extends AbstractHttpTaskFactory {
 		// 任务数据输出任务
 		pageRequestTask.addTaskOutputHandler(new PageUrlFileOutputFormatHandler());
 
-		DefaultHttpRequestTask task = new DefaultHttpRequestTask();
+		DefaultHttpRequestTask task = new DefaultHttpRequestTask(taskConfig);
 		task.setTaskName(taskName);
-		task.setHttpMethod(taskConfig.getHttpMethod());
 
 		DefaultStagedTask targetTask = new DefaultStagedTask(taskConfig, Arrays.asList(pageRequestTask, task));
 		targetTask.setTaskName(taskName);
@@ -90,6 +89,27 @@ public class DefaultTaskFactory extends AbstractHttpTaskFactory {
 		// 创建对应的url提供器
 		doCreateUrlProvider(targetTask, urlProviderConfiguration);
 		return targetTask;
+	}
+
+	private TaskConfiguration createPageRequestTaskConfiguration(TaskConfiguration taskConfig) {
+		TaskConfiguration taskConfiguration = new TaskConfiguration();
+		HttpUrlConfiguration urlConfiguration = taskConfig.getUrlsProvider().getHttpUrl();
+		taskConfiguration.setHttpMethod(urlConfiguration.getHttpMethod());
+		if (Objects.nonNull(urlConfiguration.getOutputConfiguration())) {
+			taskConfiguration.setOutput(urlConfiguration.getOutputConfiguration());
+		} else {
+			taskConfiguration.setOutput(generatePageRequestTaskConfiguration(taskConfig));
+		}
+		return taskConfiguration;
+	}
+
+	private OutputConfiguration generatePageRequestTaskConfiguration(TaskConfiguration taskConfiguration) {
+		OutputConfiguration configuration = new OutputConfiguration();
+		configuration.setFileName(taskConfiguration.getOutput().getFileName());
+		configuration.setCharset(taskConfiguration.getOutput().getCharset());
+		configuration.setPath(taskConfiguration.getOutput().getPath());
+		configuration.setSuffix("url");
+		return configuration;
 	}
 
 	/**
