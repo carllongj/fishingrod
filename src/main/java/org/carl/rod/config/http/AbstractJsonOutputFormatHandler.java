@@ -8,9 +8,9 @@ import java.util.Objects;
 
 /**
  * @author longjie
- * 2021/5/19
+ * 2021/5/31
  */
-public class JsonFormatOutputHandler extends AbstractFileOutputFormatHandler {
+public abstract class AbstractJsonOutputFormatHandler extends AbstractOutputFormatHandler {
 
 	/**
 	 * 开始标记

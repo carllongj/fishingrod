@@ -1,10 +1,12 @@
 package org.carl.rod.core.advice;
 
+import org.carl.rod.config.base.OutputConfiguration;
 import org.carl.rod.config.base.TaskConfiguration;
 import org.carl.rod.config.ctl.TaskCtl;
 import org.carl.rod.config.ctl.TaskOutputHandler;
 import org.carl.rod.config.http.HttpMappedValueTaskInputHandler;
-import org.carl.rod.config.http.JsonFormatOutputHandler;
+import org.carl.rod.config.http.JsonConsoleOutputFormatHandler;
+import org.carl.rod.config.http.JsonFileFormatOutputHandler;
 import org.carl.rod.config.http.PageUrlFileOutputFormatHandler;
 import org.carl.rod.config.http.PageUrlHttpMappedValueTaskInputHandler;
 import org.carl.rod.config.page.HttpPageRequestTask;
@@ -79,8 +81,12 @@ public class HttpMappedValueSupportAdvice implements TaskPostProcessor {
 	 * @param taskConfiguration 任务配置信息
 	 */
 	private void setOutputConfig(TaskCtl task, TaskConfiguration taskConfiguration) {
-		if (null != taskConfiguration.getOutput()) {
-			task.addTaskOutputHandler(new JsonFormatOutputHandler());
+		OutputConfiguration output = taskConfiguration.getOutput();
+		// 若开启了 only-console,则只输出到控制台
+		if (Objects.nonNull(output) && Objects.equals(Boolean.TRUE, output.getOnlyConsole())) {
+			task.addTaskOutputHandler(new JsonConsoleOutputFormatHandler());
+		} else {
+			task.addTaskOutputHandler(new JsonFileFormatOutputHandler());
 		}
 	}
 }

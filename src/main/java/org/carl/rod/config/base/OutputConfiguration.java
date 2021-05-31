@@ -29,6 +29,11 @@ public class OutputConfiguration {
 	 */
 	private String charset;
 
+	/**
+	 * 只输出到控制台
+	 */
+	private Boolean onlyConsole;
+
 	public OutputConfiguration() {
 	}
 
@@ -37,6 +42,7 @@ public class OutputConfiguration {
 		this.suffix = outputConfiguration.getSuffix();
 		this.fileName = outputConfiguration.getFileName();
 		this.charset = outputConfiguration.getCharset();
+		this.onlyConsole = outputConfiguration.onlyConsole;
 	}
 
 
@@ -70,6 +76,14 @@ public class OutputConfiguration {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+
+	public Boolean getOnlyConsole() {
+		return onlyConsole;
+	}
+
+	public void setOnlyConsole(Boolean onlyConsole) {
+		this.onlyConsole = onlyConsole;
 	}
 
 	/**

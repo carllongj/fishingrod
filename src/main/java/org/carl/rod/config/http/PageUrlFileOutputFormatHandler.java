@@ -10,7 +10,7 @@ import java.util.Objects;
  * @author longjie
  * 2021/5/21
  */
-public class PageUrlFileOutputFormatHandler extends AbstractFileOutputFormatHandler {
+public class PageUrlFileOutputFormatHandler extends AbstractOutputFormatHandler {
 
 	@Override
 	protected String formatLine(HttpMappedValue result) {

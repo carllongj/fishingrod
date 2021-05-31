@@ -33,7 +33,8 @@ public class DefaultTaskFactory extends AbstractHttpTaskFactory {
 
 	@Override
 	protected Task doCreateTask(TaskConfiguration taskConfig) {
-		if (Optional.of(taskConfig).map(TaskConfiguration::getUrlsProvider).map(UrlProviderConfiguration::getHttpUrl).isPresent()) {
+		if (Optional.of(taskConfig).map(TaskConfiguration::getUrlsProvider)
+			.map(UrlProviderConfiguration::getHttpUrl).isPresent()) {
 			return doCreateStagedTask(taskConfig);
 		} else {
 			return doCreateSingleTask(taskConfig);
@@ -146,6 +147,8 @@ public class DefaultTaskFactory extends AbstractHttpTaskFactory {
 			taskName = taskConfig.getTaskName();
 		}
 		DefaultHttpRequestTask requestTask = new DefaultHttpRequestTask(taskConfig);
+		// 创建对应的UrlProvider
+		doCreateUrlProvider(requestTask, taskConfig.getUrlsProvider());
 		requestTask.setTaskName(taskName);
 		requestTask.setHttpMethod(taskConfig.getHttpMethod());
 		// 获取http的配置

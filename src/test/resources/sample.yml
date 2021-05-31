@@ -1,0 +1,13 @@
+rod:
+  common:
+    output:
+      only-console: true
+  task-info:
+    - task-name: spider-main
+      urls-provider:
+        urls:
+          - "https://carllongj.github.io/"
+      httpMethod: get
+      selectors:
+        title:
+          - ".post-meta + h3 a"

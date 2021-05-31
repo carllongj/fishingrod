@@ -1,7 +1,26 @@
-## 简易的数据抓取框架
-### 说明
-* 针对一个抓取任务,分为两个步骤
-    1. 获取所有需要抓取的链接,此步骤为获取所有的分页中对应的数据,不会进行需要真实的数据抓取
-    2. 通过第一个的链接,针对每一个页面获取需要的数据
-    3. 获取所需要的数据
-* 每一个任务代表的是一种数据的抓取,它可以抓取单个页面,也可以抓取列表页面
+## 数据抓取工具
+* 基于`Apache HttpComponents` 和 `Jsoup` 的网页数据抓取工具
+* 通过配置来定义任务
+
+### Sample
+* 配置文件(`sample.yml`)
+```
+rod:
+  common:
+    output:
+      only-console: true
+  task-info:
+    - task-name: spider-main
+      urls-provider:
+        urls:
+          - "https://carllongj.github.io/"
+      httpMethod: get
+      selectors:
+        title:
+          - ".post-meta + h3 a"
+```
+
+* 运行任务 (`FishingRod.jar`,与`jar包同目录`)
+```
+java -jar FishingRod.jar sample.yml
+```

@@ -2,8 +2,6 @@ package org.carl.rod.config.http;
 
 import org.apache.commons.codec.Charsets;
 import org.carl.rod.config.base.OutputConfiguration;
-import org.carl.rod.config.base.TaskConfiguration;
-import org.carl.rod.config.ctl.TaskOutputHandler;
 import org.carl.rod.config.http.url.FilesUrlProvider;
 import org.carl.rod.config.page.HttpPageRequestTask;
 import org.carl.rod.config.task.HttpRequestTask;
@@ -19,52 +17,22 @@ import java.util.Collections;
 
 /**
  * @author longjie
- * 2021/5/18
+ * 2021/5/31
  */
-public abstract class AbstractFileOutputFormatHandler implements TaskOutputHandler {
+public class FileOutputHandler implements OutputHandler {
 
-	// 日志
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractFileOutputFormatHandler.class);
+	/**
+	 * 日志对象
+	 */
+	private static final Logger LOGGER = LoggerFactory.getLogger(FileOutputHandler.class);
 
 	/**
 	 * 后缀名称分隔符
 	 */
 	private static final char FILE_SUFFIX_SEPARATOR = '.';
 
-	public AbstractFileOutputFormatHandler() {
-	}
-
 	@Override
-	public boolean isSupport(Object target) {
-		return target instanceof HttpMappedValue;
-	}
-
-	@Override
-	public void handleOutput(HttpRequestTask requestTask, Object target) throws Exception {
-		HttpMappedValue result = (HttpMappedValue) target;
-
-		// 格式化对应的数据
-		String formatLine = formatLine(result);
-
-		//获取任务配置信息
-		TaskConfiguration taskConfiguration = result.getRequestTask().getTaskConfiguration();
-
-		// 获取输出配置信息
-		// TODO: 2021/5/27 处理子任务会往父级别输出定义中输出结果
-		OutputConfiguration output = taskConfiguration.getOutput();
-
-		//执行输出
-		doOutput(requestTask, formatLine, output);
-	}
-
-	/**
-	 * 执行输出内容
-	 *
-	 * @param formatLine          格式化完成的文本内容
-	 * @param outputConfiguration 输出配置信息
-	 */
-	protected void doOutput(HttpRequestTask requestTask, String formatLine, OutputConfiguration outputConfiguration) throws IOException {
-
+	public void doOutput(HttpRequestTask requestTask, String formatLine, OutputConfiguration outputConfiguration) throws IOException {
 		// 当前任务的输出路径地址
 		Path path = this.buildOutputPath(outputConfiguration.getPath(), outputConfiguration.getFileName(), outputConfiguration.getSuffix());
 		if (LOGGER.isDebugEnabled()) {
@@ -82,8 +50,6 @@ public abstract class AbstractFileOutputFormatHandler implements TaskOutputHandl
 				new FilesUrlProvider(Collections.singletonList(path.toString())));
 		}
 	}
-
-	protected abstract String formatLine(HttpMappedValue result);
 
 	/**
 	 * 构建对应的文件名称
